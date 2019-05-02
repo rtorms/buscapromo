@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/linearLayoutProdutos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="2"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgProduto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <!--</LinearLayout>-->
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="15dp"-->
+            <!--android:orientation="vertical">-->
+
+            <TextView
+                android:id="@+id/txtDescricaoProduto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Descrição Produto"
+                android:textSize="11dp" />
+
+            <TextView
+                android:id="@+id/txtMarcaProduto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Marca do Produto"
+                android:textSize="15dp" />
+
+            <TextView
+                android:id="@+id/txtCodBarrasProduto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Código Barras do Produto"
+                android:textSize="11dp" />
+
+            <TextView
+                android:id="@+id/txtValorProdutoOficial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Valor Produto"
+                android:textSize="11dp" />
+
+            <TextView
+                android:id="@+id/txtValorProdutoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Valor Informado por Usuário"
+                android:textSize="11dp" />
+
+        </GridLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:focusable="false" />
+
+</LinearLayout>
+

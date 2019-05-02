@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/action_add_promocao"
+        android:orderInCategory="100"
+        android:title="@string/addPromocao"
+        app:showAsAction="collapseActionView" />
+
+    <item
+        android:id="@+id/add_editar_perfil_super"
+        android:orderInCategory="100"
+        android:title="@string/editar_perfil_super"
+        app:showAsAction="collapseActionView" />
+
+    <item
+        android:id="@+id/action_sair_super"
+        android:orderInCategory="1000"
+        android:title="@string/desconectar"
+        app:showAsAction="collapseActionView" />
+
+</menu>

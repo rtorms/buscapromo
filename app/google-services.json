@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "719868367220",
+    "firebase_url": "https://buscapromo-7627b.firebaseio.com",
+    "project_id": "buscapromo-7627b",
+    "storage_bucket": "buscapromo-7627b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719868367220:android:2cb60e21645eafb6",
+        "android_client_info": {
+          "package_name": "utfpr.edu.br.buscapromo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719868367220-9h9uqjr19rjg1fhivphhi72r5diu76cp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "utfpr.edu.br.buscapromo",
+            "certificate_hash": "d797818ef6b92a0236c9b8bc13b9faca2bbfbd2f"
+          }
+        },
+        {
+          "client_id": "719868367220-79eaodbrj78dtpi61j4vprmkkp25uc1e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxHfsa-6Z0NIIqcyktcoZ6VBq1B4Y-qQE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719868367220-79eaodbrj78dtpi61j4vprmkkp25uc1e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

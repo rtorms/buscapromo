@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    android:id="@+id/menuUser">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_InserePromocao"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Inserir Promoção"
+            android:visible = "true"/>
+        <item
+            android:id="@+id/nav_cadProduto"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Cadastro Produtos" />
+        <item
+            android:id="@+id/nav_cadDepartamento"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Cadastro Departamento" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Slideshow" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />
+    </group>
+
+    <item android:title="Conta">
+        <menu>
+            <item
+                android:id="@+id/nav_editarPerfil"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Editar Perfil" />
+            <item
+                android:id="@+id/action_deslogar"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Desconectar" />
+        </menu>
+    </item>
+
+    <item android:title="Administrador"
+            android:id="@+id/itemMenuAdm">
+        <menu>
+            <item
+                android:id="@+id/action_add_usuario_via_adm"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/addusuario" />
+            <item
+                android:id="@+id/action_add_supermercado"
+                android:icon="@drawable/ic_menu_send"
+                android:title="@string/addsupermercado" />
+        </menu>
+    </item>
+
+</menu>
