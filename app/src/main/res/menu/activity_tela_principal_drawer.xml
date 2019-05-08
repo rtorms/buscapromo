@@ -18,10 +18,17 @@
             android:id="@+id/nav_cadDepartamento"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Cadastro Departamento" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+
+
+        <!--<item android:title="Categorias">-->
+            <!--<menu>-->
+                <!--<item-->
+                <!--android:id="@+id/nav_Categorias"-->
+                <!--android:icon="@drawable/ic_menu_slideshow"-->
+                <!--android:title="Slideshow" />-->
+            <!--</menu>-->
+        <!--</item>-->
+
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"

@@ -19,7 +19,7 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity.CadastroDepartamentoActivity"></activity>
+        <activity android:name=".Activity.CadastroDepartamentoActivity"/>
         <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

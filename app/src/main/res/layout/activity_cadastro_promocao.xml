@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,106 +12,137 @@
     android:orientation="vertical"
     tools:context=".Activity.CadastroPromocaoActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayoutProdutos"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_margin="16dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/fotoProduto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-               />
-
-        </LinearLayout>
-
-        <LinearLayout
+            android:id="@+id/linearLayoutCadastroProdutos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/txtMarcaProduto"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Marca do Produto"
-                android:textSize="15dp" />
+                android:onClick="fotoCadProdutoOnClick"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/txtDescricaoProduto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Descrição Produto"
-                android:textSize="11dp" />
 
-            <TextView
-                android:id="@+id/txtCodBarrasProduto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Código Barras do Produto"
-                android:textSize="11dp" />
+                <ImageView
+                    android:id="@+id/fotoProduto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
 
-            <TextView
-                android:id="@+id/txtValorProdutoOficial"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Valor Produto"
-                android:textSize="11dp" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/txtValorProdutoUsuario"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edtCadCodBarProd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Cod. Barras (click para scan)"
+                    android:inputType="textCapWords"
+                    android:onClick="edtCadCodBarProdOnClick" />
+
+                <Button
+                    android:id="@+id/btnFindCodBarDig"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:drawableBottom="@android:drawable/ic_menu_search"
+                    android:onClick="btnFindCodBarDigOnclick" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Valor Informado por Usuário"
-                android:textSize="11dp" />
+                android:layout_margin="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Produto"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/txtDescricaoProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Descrição Produto"
+                    android:textSize="11dp" />
+
+                <TextView
+                    android:id="@+id/txtCodBarrasProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Código Barras do Produto"
+                    android:textSize="11dp" />
+
+                <TextView
+                    android:id="@+id/txtValorProdutoOficial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Valor Produto"
+                    android:textSize="11dp" />
+
+                <TextView
+                    android:id="@+id/txtValorProdutoUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Valor Informado por Usuário"
+                    android:textSize="11dp" />
+
+            </LinearLayout>
+
+
+            <!--<View-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_marginTop="15dp"-->
+            <!--android:layout_marginBottom="15dp"-->
+            <!--android:focusable="false" />-->
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btnSalvar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="SALVAR" />
+
+                <Button
+                    android:id="@+id/btnCancelar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:onClick="btnCancelarOnclickListener"
+                    android:text="CANCELAR" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="15dp"
-        android:layout_marginTop="15dp"
-        android:focusable="false" />
-
-
-
-    <ImageView
-        android:id="@+id/imagemProduto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    <Button
-        android:id="@+id/btnSalvar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:text="SALVAR" />
-
-    <Button
-        android:id="@+id/btnCancelar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CANCELAR"
-        android:layout_marginBottom="16dp"
-        android:onClick="btnCancelarOnclickListener"/>
-
+    </ScrollView>
 
 </LinearLayout>
 

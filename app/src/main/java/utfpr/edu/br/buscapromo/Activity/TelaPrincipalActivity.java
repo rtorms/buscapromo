@@ -1,14 +1,16 @@
 package utfpr.edu.br.buscapromo.Activity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +44,6 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import utfpr.edu.br.buscapromo.Adapter.PromocaoAdapter;
 import utfpr.edu.br.buscapromo.Classes.Produto;
-import utfpr.edu.br.buscapromo.Helper.UsuarioLogado;
 import utfpr.edu.br.buscapromo.R;
 
 public class TelaPrincipalActivity extends AppCompatActivity
@@ -55,14 +58,16 @@ public class TelaPrincipalActivity extends AppCompatActivity
     private String provider;
     private DatabaseReference reference;
     private String email;
+    private EditText edtFind;
+    private String departamentoSelecionado;
+    private AlertDialog alerta;
 
     private RecyclerView mRecyclerViewPromocao;
     private PromocaoAdapter adapter;
     private List<Produto> produtos;
-    private DatabaseReference referenciaFirebase;
+    private DatabaseReference databaseReference;
     private Produto todosProdutos;
     private LinearLayoutManager mLayoutManagerTodosProdutos;
-
 
 
     @Override
@@ -72,6 +77,8 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        edtFind = findViewById(R.id.edtFind);
+        edtFind.setEnabled(false);
 
         autenticacao = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference();
@@ -113,7 +120,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
             editarPerfil.setVisible(false);
             menuAdm.setVisible(false);
 
-        }else {
+        } else {
 
             reference.child("usuarios").orderByChild("email").equalTo(email).addValueEventListener(new ValueEventListener() {
                 @Override
@@ -124,13 +131,13 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
                         if (!tipoUsuarioCad.equals("Administrador")) {
                             menuAdm.setVisible(false);
-                        }
-                        else if((!tipoUsuarioCad.equals("Supermercado")) || (!tipoUsuarioCad.equals("Administrador"))){
+                        } else if ((!tipoUsuarioCad.equals("Supermercado")) || (!tipoUsuarioCad.equals("Administrador"))) {
                             insereDepartamento.setVisible(false);
                             inserePromo.setVisible(false);
                         }
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Toast.makeText(TelaPrincipalActivity.this, "Cancelado pelo usuário!!", Toast.LENGTH_LONG).show();
@@ -141,7 +148,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
         mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodosProdutos);
 
-    //    carregarPromocoes();
+        carregarPromocoes();
 
     }
 
@@ -196,11 +203,10 @@ public class TelaPrincipalActivity extends AppCompatActivity
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroProdutoActivity.class);
             abrirTela(intent);
 
-        }else if (id == R.id.nav_cadDepartamento) {
+        } else if (id == R.id.nav_cadDepartamento) {
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroDepartamentoActivity.class);
             abrirTela(intent);
 
-        } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
 
@@ -222,10 +228,10 @@ public class TelaPrincipalActivity extends AppCompatActivity
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroUserViaAdmActivity.class);
             abrirTela(intent);
 
-        }else if (id == R.id.action_add_supermercado) {
+        } else if (id == R.id.action_add_supermercado) {
 
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroSupermercadoActivity.class);
-            abrirTela( intent);
+            abrirTela(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -233,7 +239,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
         return true;
     }
 
-    private void abrirTela(Intent intent){
+    private void abrirTela(Intent intent) {
         startActivity(intent);
     }
 
@@ -247,18 +253,18 @@ public class TelaPrincipalActivity extends AppCompatActivity
     }
 
 
-
     private void carregarPromocoes() {
 
 //        mRecyclerViewPromocao.setHasFixedSize(true);
         mRecyclerViewPromocao.setLayoutManager(new GridLayoutManager(this, 2));
-      //  mLayoutManagerTodosProdutos = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-    //    mRecyclerViewPromocao.setLayoutManager(mLayoutManagerTodosProdutos);
+        //  mLayoutManagerTodosProdutos = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        //    mRecyclerViewPromocao.setLayoutManager(mLayoutManagerTodosProdutos);
         produtos = new ArrayList<>();
-        referenciaFirebase = FirebaseDatabase.getInstance().getReference();
-        referenciaFirebase.child("produtos").addValueEventListener(new ValueEventListener() {
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("produtos").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                produtos.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     todosProdutos = postSnapshot.getValue(Produto.class);
                     produtos.add(todosProdutos);
@@ -274,4 +280,69 @@ public class TelaPrincipalActivity extends AppCompatActivity
         adapter = new PromocaoAdapter(produtos, this);
         mRecyclerViewPromocao.setAdapter(adapter);
     }
+
+    // alterei aqui para testar dialog, necessário rever
+    public void findPromocaoOnClick(View view) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(TelaPrincipalActivity.this);
+        builder.setCancelable(true);
+        builder.setTitle("FILTRAR PESQUISA");
+        builder.setMessage("Como deseja Filtrar?");
+
+        builder.setPositiveButton("TEXTO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//                edtFind.setEnabled(true);
+//                edtFind.setFocusable(true);
+                // alterei aqui para testar dialog, necessário rever
+
+                Dialog mDialog = new Dialog(TelaPrincipalActivity.this, R.style.AppBaseTheme);
+                mDialog.setContentView(R.layout.fullscreen);
+                mDialog.show();
+            }
+        });
+
+        builder.setNegativeButton("Departamento", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                databaseReference.child("departamentos").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        final List<String> dep = new ArrayList<String>();
+
+                        for (DataSnapshot depSnapshot : dataSnapshot.getChildren()) {
+                            String nomeDep = depSnapshot.child("descricao").getValue(String.class);
+                            dep.add(nomeDep);
+                        }
+
+                        ArrayAdapter<String> depAdapter = new ArrayAdapter<String>(TelaPrincipalActivity.this,
+                                R.layout.find_departamento, dep);
+                     //  AlertDialog.Builder builder1 = new AlertDialog.Builder(TelaPrincipalActivity.this);
+
+                    //    depAdapter.setDropDownViewResource(R.layout.find_departamento);
+
+                        builder.setSingleChoiceItems(depAdapter, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                departamentoSelecionado = dialog.toString();
+                                alerta.dismiss();
+                            }
+                        });
+
+                        alerta = builder.create();
+                        alerta.show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
+        alerta = builder.create();
+        alerta.show();
+    }
+
+
 }
+

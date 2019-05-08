@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
 
     <!-- Base application theme. -->
@@ -57,7 +57,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
-
+    <style name="AppBaseTheme" parent="@android:style/Theme.Light.NoTitleBar.Fullscreen" />
 
 </resources>

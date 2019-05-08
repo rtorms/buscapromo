@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -66,6 +67,7 @@ public class CadastroProdutoActivity extends AppCompatActivity {
     private Spinner spDepartamento;
     private String idProd;
     private ProgressBar progressBar;
+    private Button btnBuscaCodBarDig;
 
 
     @Override
@@ -82,6 +84,8 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         edtCadEmbalagemProduto = findViewById(R.id.edtCadEmbalagemProduto);
         spDepartamento = findViewById(R.id.spDepartamento);
         progressBar = findViewById(R.id.progressBarProduto);
+        btnBuscaCodBarDig = findViewById(R.id.btnBuscaCodBarDig);
+        btnBuscaCodBarDig.setVisibility(View.INVISIBLE);
 
         storage = FirebaseStorage.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -273,7 +277,7 @@ public class CadastroProdutoActivity extends AppCompatActivity {
                 produto.setIdProd(idProd);
                 databaseReference.child(idProd).setValue(produto);
                 Toast.makeText(CadastroProdutoActivity.this, "Produto Cadastrado com Sucesso!!", Toast.LENGTH_LONG).show();
-                limparCampos();
+
             } catch (Exception e) {
                 Toast.makeText(CadastroProdutoActivity.this, "Erro ao salvar produto", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
@@ -283,7 +287,7 @@ public class CadastroProdutoActivity extends AppCompatActivity {
 
                 databaseReference.child(idProd).setValue(produto);
                 Toast.makeText(CadastroProdutoActivity.this, "Produto Editado com Sucesso!!", Toast.LENGTH_LONG).show();
-                limparCampos();
+
             }
             catch (Exception e){
                 Toast.makeText(CadastroProdutoActivity.this, "Erro ao salvar produto", Toast.LENGTH_LONG).show();
@@ -291,19 +295,18 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             }
         }
 
-    }
-
-    private void limparCampos(){
-
-        progressBar.setVisibility(View.GONE);
-        edtCadNomeProduto.setText("");
-        edtCadCodBarrasProduto.setText("");
-        edtCadTipoProduto.setText("");
-        edtCadMarcaProduto.setText("");
-        edtCadConteudoProduto.setText("");
-        edtCadEmbalagemProduto.setText("");
+        resetIntent();
 
     }
+
+
+
+    private void resetIntent(){
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
 
     public void btnCancelarOnclickListener(View view) {
 
@@ -368,7 +371,7 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-
+                    btnBuscaCodBarDig.setVisibility(View.INVISIBLE);
                     IntentIntegrator intentIntegrator = new IntentIntegrator(camera);
                     intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
                     intentIntegrator.setPrompt("SCAN");
@@ -385,10 +388,16 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 edtCadCodBarrasProduto.setFocusable(true);
-                limparCampos();
+                btnBuscaCodBarDig.setVisibility(View.VISIBLE);
+
             }
         });
         alerta = builder.create();
         alerta.show();
+    }
+
+    public void btnBuscaCodBarDigOnclick(View view) {
+        carregaProduto();
+        carregaImagemProduto();
     }
 }

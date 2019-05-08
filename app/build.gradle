@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -29,14 +30,14 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     //autenticação firebase
-    implementation 'com.google.firebase:firebase-auth:16.1.0'
+    implementation 'com.google.firebase:firebase-auth:16.2.0'
     //armazenamento de arquivos firebase
-    implementation 'com.google.firebase:firebase-storage:16.0.5'
+    implementation 'com.google.firebase:firebase-storage:16.1.0'
     //banco de dados firebase
-    implementation 'com.google.firebase:firebase-database:16.0.6'
+    implementation 'com.google.firebase:firebase-database:16.1.0'
     //login facebook
     implementation 'com.facebook.android:facebook-login:[4,5)'
-    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-core:16.0.8'
     //picasso - tratamento imagem
     implementation 'com.squareup.picasso:picasso:2.71828'
     //recyclerView
@@ -52,12 +53,12 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
     //leitura código barras
-    implementation 'com.google.firebase:firebase-ml-vision:19.0.3'
+    implementation 'com.google.firebase:firebase-ml-vision:19.0.2'
     implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
 
     //GPS
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
 
 
 }

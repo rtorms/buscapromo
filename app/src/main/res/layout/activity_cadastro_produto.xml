@@ -27,8 +27,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:onClick="fotoCadProdutoOnClick">
+                android:onClick="fotoCadProdutoOnClick"
+                android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/fotoCadProduto"
@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Inserir/Editar Imagem"/>
+                    android:text="Inserir/Editar Imagem" />
 
             </LinearLayout>
 
@@ -51,27 +51,41 @@
                 android:layout_margin="15dp"
                 android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/edtCadCodBarrasProduto"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="Cod. Barras (click para scan)"
-                    android:inputType="textCapWords"
-                    android:onClick="edtCadCodBarrasOnClick"/>
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/edtCadNomeProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Nome Produto"
-                    android:inputType="textCapWords" />
+                    <EditText
+                        android:id="@+id/edtCadCodBarrasProduto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Cod. Barras (click para scan)"
+                        android:inputType="textCapWords"
+                        android:onClick="edtCadCodBarrasOnClick" />
 
+                    <Button
+                        android:id="@+id/btnBuscaCodBarDig"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:drawableBottom="@android:drawable/ic_menu_search"
+                        android:onClick="btnBuscaCodBarDigOnclick"/>
+
+
+                </LinearLayout>
 
                 <EditText
                     android:id="@+id/edtCadTipoProduto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Tipo Produto"
+                    android:inputType="textCapWords" />
+
+                <EditText
+                    android:id="@+id/edtCadNomeProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nome Produto"
                     android:inputType="textCapWords" />
 
 
@@ -100,9 +114,9 @@
 
                 <Spinner
                     android:id="@+id/spDepartamento"
+                    style="@android:style/Widget.Holo.Light.Spinner"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    style="@android:style/Widget.Holo.Light.Spinner"/>
+                    android:layout_height="wrap_content" />
 
                 <ProgressBar
                     android:id="@+id/progressBarProduto"
@@ -121,8 +135,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:text="SALVAR"
-                    android:onClick="btnSalvarProdutoOnClick"/>
+                    android:onClick="btnSalvarProdutoOnClick"
+                    android:text="SALVAR" />
 
                 <Button
                     android:id="@+id/btnCancelar"
@@ -133,12 +147,10 @@
                     android:text="CANCELAR" />
 
 
-
             </LinearLayout>
         </LinearLayout>
 
     </ScrollView>
-
 
 
 </LinearLayout>
