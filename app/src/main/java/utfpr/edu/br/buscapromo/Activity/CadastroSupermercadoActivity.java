@@ -268,11 +268,9 @@ public class CadastroSupermercadoActivity extends AppCompatActivity implements L
 
     }
 
-
     public void btnCancelarOnclickListener(View view) {
         Intent intent = new Intent(CadastroSupermercadoActivity.this, TelaPrincipalActivity.class);
         finish();
         startActivity(intent);
-
     }
 }

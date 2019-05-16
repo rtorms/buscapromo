@@ -69,17 +69,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:drawableBottom="@android:drawable/ic_menu_search"
-                        android:onClick="btnBuscaCodBarDigOnclick"/>
+                        android:onClick="btnBuscaCodBarDigOnclick"
+                        android:visibility="gone"/>
 
 
                 </LinearLayout>
 
-                <EditText
-                    android:id="@+id/edtCadTipoProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Tipo Produto"
-                    android:inputType="textCapWords" />
 
                 <EditText
                     android:id="@+id/edtCadNomeProduto"
@@ -88,6 +83,13 @@
                     android:hint="Nome Produto"
                     android:inputType="textCapWords" />
 
+
+                <EditText
+                    android:id="@+id/edtCadTipoProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tipo Produto"
+                    android:inputType="textCapWords" />
 
                 <EditText
                     android:id="@+id/edtCadMarcaProduto"

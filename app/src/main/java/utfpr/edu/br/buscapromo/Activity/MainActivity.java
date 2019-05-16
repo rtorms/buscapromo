@@ -13,11 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import utfpr.edu.br.buscapromo.R;
 
-
-
 public class MainActivity extends AppCompatActivity {
-    
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -28,9 +24,6 @@ public class MainActivity extends AppCompatActivity {
         verificaLogin();
         permission();
     }
-
-
-
 
     private void verificaLogin(){
         if (usuarioLogado()){

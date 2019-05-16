@@ -86,9 +86,7 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         holder.txtDescricaoProduto.setText(item.getNomeProduto() +" " + item.getTipo() + " " + item.getMarca()
                 + " " + item.getEmbalagem() + " " + item.getConteudo());
         holder.txtMarcaProduto.setText(item.getMarca());
-//        holder.txtCodBarras.setText("EAN: " + item.getCodBarras());
-//        holder.txtValorOficial.setText("Valor Inicial: R$" + item.getValorOficial());
-//        holder.txtValorUsuario.setText("Menor Valor: R$" + item.getValorUsuario());
+
 
         // ---- busca de imagem do produto
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -114,13 +112,8 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-     //   protected TextView txtNomeProduto;
         protected TextView txtMarcaProduto;
         protected TextView txtDescricaoProduto;
-//        protected TextView txtEmbalagemProduto;
-//        protected TextView txtConteudoProduto;
-        protected TextView txtValorOficial;
-        protected TextView txtValorUsuario;
         protected ImageView imgProduto;
         protected LinearLayout linearLayoutProdutos;
 
@@ -131,10 +124,6 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
 
             txtMarcaProduto = (TextView) itemView.findViewById(R.id.txtMarcaProduto);
             txtDescricaoProduto = (TextView) itemView.findViewById(R.id.txtDescricaoProduto);
-//            txtTipoBarras = (TextView) itemView.findViewById(R.id.txtTipoProduto);
-//            txtEmbalagemProduto = (TextView) itemView.findViewById(R.id.edtCadEmbalagemProduto);
-//            txtValorOficial = (TextView) itemView.findViewById(R.id.txtValorProdutoOficial);
-//            txtValorUsuario = (TextView) itemView.findViewById(R.id.txtValorProdutoUsuario);
             imgProduto = (ImageView)  itemView.findViewById(R.id.imgProduto);
             linearLayoutProdutos = (LinearLayout) itemView.findViewById(R.id.linearLayoutProdutos);
         }

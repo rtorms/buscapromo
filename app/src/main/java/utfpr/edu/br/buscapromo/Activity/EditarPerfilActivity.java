@@ -41,11 +41,9 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
-import utfpr.edu.br.buscapromo.Helper.UsuarioLogado;
 import utfpr.edu.br.buscapromo.R;
 
 public class EditarPerfilActivity extends AppCompatActivity {
-
 
     private Button btnSalvar;
     private Button btnCancelar;
@@ -74,30 +72,30 @@ public class EditarPerfilActivity extends AppCompatActivity {
         autenticacao = ConfiguracaoFirebase.getFirebaseAuth();
         storageReference = ConfiguracaoFirebase.getFirebaseStorageReference();
         reference = FirebaseDatabase.getInstance().getReference();
-        newNomeUsuario = (EditText) findViewById(R.id.edtEditarNome);
-        senhaUsuario1 = (EditText) findViewById(R.id.edtEditarSenha1);
-        senhaUsuario2 = (EditText) findViewById(R.id.edtEditarSenha2);
-        imgFotoPerfil = (ImageView) findViewById(R.id.imgPerfil);
-        btnSalvar = (Button) findViewById(R.id.btnSalvar);
-        btnCancelar = (Button) findViewById(R.id.btnCancelar);
+        newNomeUsuario = findViewById(R.id.edtEditarNome);
+        senhaUsuario1 = findViewById(R.id.edtEditarSenha1);
+        senhaUsuario2 = findViewById(R.id.edtEditarSenha2);
+        imgFotoPerfil = findViewById(R.id.imgPerfil);
+        btnSalvar = findViewById(R.id.btnSalvar);
+        btnCancelar = findViewById(R.id.btnCancelar);
         usuario = autenticacao.getCurrentUser();
-        emailUsuario = usuario.getEmail().toString();
-        oldNomeUsuario = (EditText) findViewById(R.id.edtEditarNome);
-        checkboxAlteraNomeSenha = (CheckBox) findViewById(R.id.checkboxAlteraNomeSenha);
-        editarNomeSenhaLinearLayout = (LinearLayout) findViewById(R.id.editarNomeSenhaLinearLayout);
+        emailUsuario = usuario.getEmail();
+        oldNomeUsuario = findViewById(R.id.edtEditarNome);
+        checkboxAlteraNomeSenha = findViewById(R.id.checkboxAlteraNomeSenha);
+        editarNomeSenhaLinearLayout = findViewById(R.id.editarNomeSenhaLinearLayout);
 
 
         //para não gerar erro primeiro acesso após cadastro
         Intent it = getIntent();
         String nomeUser = it.getStringExtra("nome");
-        String usuarioCadastrado =  it.getStringExtra("tipoUsuarioCad");
+        String usuarioCadastrado = it.getStringExtra("tipoUsuarioCad");
         oldNomeUsuario.setText(nomeUser);
         tipoUsuarioCad = usuarioCadastrado;
-        if (tipoUsuarioCad.equals("Supermercado")){
+        if (tipoUsuarioCad.equals("Supermercado")) {
             checkboxAlteraNomeSenha.setText("Alterar senha");
         }
 
-        editarNomeSenhaLinearLayout.setVisibility(View.INVISIBLE);
+        editarNomeSenhaLinearLayout.setVisibility(View.GONE);
         editarNomeSenhaLinearLayout.setEnabled(false);
 
         carregaImagemPerfil();
@@ -190,28 +188,28 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
     private void carregaImagemPerfil() {
 
-            FirebaseStorage storage = FirebaseStorage.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
-            final StorageReference storageReference = storage.getReferenceFromUrl
-                    ("gs://buscapromo-7627b.appspot.com/fotoPerfilUsuario/" + emailUsuario + ".jpg");
+        final StorageReference storageReference = storage.getReferenceFromUrl
+                ("gs://buscapromo-7627b.appspot.com/fotoPerfilUsuario/" + emailUsuario + ".jpg");
 
-            final int heigth = 300;
-            final int width = 300;
+        final int heigth = 300;
+        final int width = 300;
 
-            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Picasso.get().load(uri).resize(width, heigth).centerCrop().into(imgFotoPerfil);
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.get().load(uri).resize(width, heigth).centerCrop().into(imgFotoPerfil);
 
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(EditarPerfilActivity.this, "Imagem perfil não encontrada!!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(EditarPerfilActivity.this, "Imagem perfil não encontrada!!", Toast.LENGTH_SHORT).show();
 
-                }
-            });
+            }
+        });
 
 
     }
@@ -231,18 +229,18 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
                 final String novoNome = newNomeUsuario.getText().toString();
                 final String novaSenha = senhaUsuario1.getText().toString();
-                final String email = autenticacao.getCurrentUser().getEmail().toString();
+                final String email = autenticacao.getCurrentUser().getEmail();
 
 //                final String oldNomeUsuario = autenticacao.getCurrentUser().getDisplayName().toString();
 
-                    reference.child("usuarios").orderByChild("email").equalTo(email.toString()).addValueEventListener(new ValueEventListener() {
+                reference.child("usuarios").orderByChild("email").equalTo(email).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot posSnapshot : dataSnapshot.getChildren()) {
                             final String keyUser = posSnapshot.child("key").getValue().toString();
 
                             if (email != null) {
-                                if(!tipoUsuarioCad.equals("Supermercado")) {
+                                if (!tipoUsuarioCad.equals("Supermercado")) {
                                     UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                             .setDisplayName(novoNome).build();
                                     usuario.updateProfile(profileUpdates)
@@ -259,24 +257,24 @@ public class EditarPerfilActivity extends AppCompatActivity {
                                             });
                                 }
                                 usuario.updatePassword(novaSenha).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(EditarPerfilActivity.this, "Senha salva com sucesso!!", Toast.LENGTH_SHORT).show();
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(EditarPerfilActivity.this, "Senha salva com sucesso!!", Toast.LENGTH_SHORT).show();
 
-                                            }
                                         }
-                                    });
-                                }
-                                Toast.makeText(EditarPerfilActivity.this, "Edição realizada com sucesso!!", Toast.LENGTH_SHORT).show();
-
-                                autenticacao.signOut();
-                                Intent intent = new Intent(EditarPerfilActivity.this, MainActivity.class);
-                                finish();
-                                startActivity(intent);
+                                    }
+                                });
                             }
+                            Toast.makeText(EditarPerfilActivity.this, "Edição realizada com sucesso!!", Toast.LENGTH_SHORT).show();
 
+                            autenticacao.signOut();
+                            Intent intent = new Intent(EditarPerfilActivity.this, MainActivity.class);
+                            finish();
+                            startActivity(intent);
                         }
+
+                    }
 
 
                     @Override
@@ -297,8 +295,8 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
     public void onCheckboxClicked(View view) {
         if (checkboxAlteraNomeSenha.isChecked()) {
-            if(tipoUsuarioCad.equals("Supermercado")) {
-               newNomeUsuario.setEnabled(false);
+            if (tipoUsuarioCad.equals("Supermercado")) {
+                newNomeUsuario.setEnabled(false);
 
             }
             newNomeUsuario.setText(oldNomeUsuario.getText());
@@ -306,7 +304,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
 
         } else {
-            editarNomeSenhaLinearLayout.setVisibility(View.INVISIBLE);
+            editarNomeSenhaLinearLayout.setVisibility(View.GONE);
 
         }
 

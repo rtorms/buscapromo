@@ -19,7 +19,12 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity.CadastroDepartamentoActivity"/>
+        <service
+            android:name=".DAO.FindProdutos"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity android:name=".Activity.CadastroDepartamentoActivity" />
         <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,11 +39,17 @@
         <activity android:name=".Activity.PromocaoActivity" />
         <activity android:name=".Activity.CadastroSupermercadoActivity" />
         <activity android:name=".Activity.EditarPerfilActivity" />
-        <activity android:name=".Activity.CadastroPromocaoActivity" />
+        <activity
+            android:name=".Activity.CadastroPromocaoActivity"
+            android:configChanges="orientation" />
         <activity android:name=".Activity.CadastroUserViaAdmActivity" />
         <activity android:name=".Activity.CadastroUsuarioSimplesActivity" />
         <activity android:name=".Activity.LoginActivity" />
-        <activity android:name=".Activity.CadastroProdutoActivity" android:configChanges="orientation" />
+        <activity
+            android:name=".Activity.CadastroProdutoActivity"
+            android:configChanges="orientation" />
+
+
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

@@ -29,10 +29,7 @@ public class CadastroDepartamentoActivity extends AppCompatActivity {
         edtDepartamento = findViewById(R.id.edtCadDepartamento);
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("departamentos");
-
-
     }
-
 
     public void btnCadDepartamento(View view) {
 
@@ -50,7 +47,6 @@ public class CadastroDepartamentoActivity extends AppCompatActivity {
             Toast.makeText(CadastroDepartamentoActivity.this, "Erro ao salvar departamento", Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
-
     }
 
     public void btnCancelarOnclickListener(View view) {

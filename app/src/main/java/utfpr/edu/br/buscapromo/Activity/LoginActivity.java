@@ -163,8 +163,6 @@ public class LoginActivity extends AppCompatActivity {
         autenticacao.removeAuthStateListener(firebaseAuthListener);
     }
 
-
-
     public void btnLoginOnclick(View view) {
         if (!edtEmailLogin.getText().toString().equals("") && !edtSenhaLogin.getText().toString().equals("")) {
             usuario = new Usuario();
@@ -176,8 +174,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(LoginActivity.this, "Preencha os campos de E-Mail e Senha", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

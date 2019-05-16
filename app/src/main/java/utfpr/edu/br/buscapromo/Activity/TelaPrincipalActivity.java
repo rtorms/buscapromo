@@ -316,9 +316,9 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
                         ArrayAdapter<String> depAdapter = new ArrayAdapter<String>(TelaPrincipalActivity.this,
                                 R.layout.find_departamento, dep);
-                     //  AlertDialog.Builder builder1 = new AlertDialog.Builder(TelaPrincipalActivity.this);
+                        //  AlertDialog.Builder builder1 = new AlertDialog.Builder(TelaPrincipalActivity.this);
 
-                    //    depAdapter.setDropDownViewResource(R.layout.find_departamento);
+                        //    depAdapter.setDropDownViewResource(R.layout.find_departamento);
 
                         builder.setSingleChoiceItems(depAdapter, 0, new DialogInterface.OnClickListener() {
                             @Override
