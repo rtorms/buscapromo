@@ -35,8 +35,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import utfpr.edu.br.buscapromo.Classes.Supermercado;
-import utfpr.edu.br.buscapromo.Classes.Usuario;
+import utfpr.edu.br.buscapromo.Model.Supermercado;
+import utfpr.edu.br.buscapromo.Model.Usuario;
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
 import utfpr.edu.br.buscapromo.R;
 

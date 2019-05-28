@@ -1,4 +1,4 @@
-package utfpr.edu.br.buscapromo.Classes;
+package utfpr.edu.br.buscapromo.Model;
 
 public class Produto {
 

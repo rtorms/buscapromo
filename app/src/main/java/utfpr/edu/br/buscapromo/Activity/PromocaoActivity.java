@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,16 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import utfpr.edu.br.buscapromo.Adapter.PromocaoAdapter;
-import utfpr.edu.br.buscapromo.Classes.Produto;
+import utfpr.edu.br.buscapromo.Model.Promocao;
 import utfpr.edu.br.buscapromo.R;
 
 public class PromocaoActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerViewPromocao;
     private PromocaoAdapter adapter;
-    private List<Produto> produtos;
+    private List<Promocao> promocoes;
     private DatabaseReference referenciaFirebase;
-    private Produto todosProdutos;
+    private Promocao todasPromocoes;
     private LinearLayoutManager mLayoutManagerTodosProdutos;
 
 
@@ -35,7 +34,7 @@ public class PromocaoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_promocao);
         
-        mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodosProdutos);
+        mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodasPromocoes);
         
         carregarTodosProdutos();
     }
@@ -48,20 +47,20 @@ public class PromocaoActivity extends AppCompatActivity {
 
         mRecyclerViewPromocao.setLayoutManager(mLayoutManagerTodosProdutos);
 
-        produtos = new ArrayList<>();
+        promocoes = new ArrayList<>();
 
         referenciaFirebase = FirebaseDatabase.getInstance().getReference();
 
-        referenciaFirebase.child("produtos").addValueEventListener(new ValueEventListener() {
+        referenciaFirebase.child("promocoes").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
-                    todosProdutos = postSnapshot.getValue(Produto.class);
+                    todasPromocoes = postSnapshot.getValue(Promocao.class);
 
-                    produtos.add(todosProdutos);
+                    promocoes.add(todasPromocoes);
 
                 }
 
@@ -75,7 +74,7 @@ public class PromocaoActivity extends AppCompatActivity {
         });
 
 
-        adapter = new PromocaoAdapter(produtos, this);
+        adapter = new PromocaoAdapter(promocoes, this);
 
         mRecyclerViewPromocao.setAdapter(adapter);
 

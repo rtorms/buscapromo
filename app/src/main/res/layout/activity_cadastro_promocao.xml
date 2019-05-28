@@ -24,8 +24,10 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/imgLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:onClick="fotoCadPromocaoOnClick"
                 android:orientation="vertical">
 
@@ -35,7 +37,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_menu_camera" />
+                    android:src="@drawable/ic_menu_camera"/>
+
+                <!--<TextView-->
+                    <!--android:id="@+id/tvImg"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="center"-->
+                    <!--android:text="Inserir Imagem"-->
+                     <!--/>-->
+
+                <TextView
+                    android:id="@+id/tvMostrarCodBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="16dp"
+                     />
+
+
+                <TextView
+                    android:id="@+id/tvProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@android:color/holo_red_light"
+                    android:textSize="20dp" />
 
             </LinearLayout>
 
@@ -45,75 +72,64 @@
                 android:layout_marginTop="15dp"
                 android:orientation="vertical">
 
+                <Button
+                    android:id="@+id/btnFindProduto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:onClick="btnFinProdutoOnClick"
+                    android:text="INFORMAR CÓDIGO BARRAS" />
+
+
                 <EditText
                     android:id="@+id/edtCadCodBarProd"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:hint="Cod. Barras (click para scan)"
-                    android:inputType="textCapWords"
-                    android:onClick="edtCadCodBarProdOnClick" />
-
-                <Button
-                    android:id="@+id/btnFindCodBarDig"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:drawableBottom="@android:drawable/ic_menu_search"
-                    android:onClick="btnFindCodBarDigOnclick"
+                    android:hint="Digite o Código Barras"
+                    android:inputType="number"
+                    android:maxLength="13"
+                    android:onClick="edtCadCodBarProdOnClick"
                     android:visibility="gone" />
 
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="15dp"
-                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Descrição do Produto"
-                    android:textSize="15dp" />
-
-                <!--<TextView-->
-                <!--android:id="@+id/txtDescricaoProduto"-->
+            <!--<LinearLayout-->
+                <!--android:id="@+id/informarProdutoLinearLayout"-->
                 <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:text="Descrição Produto"-->
-                <!--android:textSize="11dp" />-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:orientation="vertical"-->
+                <!--android:visibility="gone">-->
 
-            </LinearLayout>
+                <!--<EditText-->
+                    <!--android:id="@+id/edtNomeProduto"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:hint="Nome do Produto"-->
+                    <!--android:textSize="15dp" />-->
 
-            <LinearLayout
-                android:id="@+id/informarProdutoLinearLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <EditText
-                    android:id="@+id/txtMarcaInformada"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:hint="Marca Produto"
-                    android:textSize="11dp" />
-
-                <EditText
-                    android:id="@+id/txtDescricaoInformada"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:hint="Descreva o Produto"
-                    android:textSize="11dp" />
+                <!--<EditText-->
+                    <!--android:id="@+id/edtMarcaProduto"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:hint="Marca do Produto"-->
+                    <!--android:textSize="15dp" />-->
 
 
-            </LinearLayout>
+                <!--<EditText-->
+                    <!--android:id="@+id/edtDescricaoInformada"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:hint="Descreva o Produto"-->
+                    <!--android:textSize="15dp" />-->
+
+
+            <!--</LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -130,13 +146,14 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center">
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
 
                     <Button
                         android:id="@+id/btnDataInicial"
                         android:layout_width="45dp"
                         android:layout_height="50dp"
+                        android:layout_marginRight="5dp"
                         android:drawableBottom="@android:drawable/ic_menu_my_calendar"
                         android:onClick="insereDataOnclick"
                         android:tag="dataIn" />
@@ -149,14 +166,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="left"
                             android:hint="Data Inicio" />
 
                         <TextView
                             android:id="@+id/tvDataInicial"
                             android:layout_width="110dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="right"
                             android:textSize="15dp" />
                     </LinearLayout>
 
@@ -164,6 +181,7 @@
                         android:id="@+id/btnDataFinal"
                         android:layout_width="45dp"
                         android:layout_height="50dp"
+                        android:layout_marginRight="5dp"
                         android:drawableBottom="@android:drawable/ic_menu_my_calendar"
                         android:onClick="insereDataOnclick"
                         android:tag="dataOut" />
@@ -176,14 +194,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="left"
                             android:hint="Data Fim" />
 
                         <TextView
                             android:id="@+id/tvDataFinal"
                             android:layout_width="110dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="left"
                             android:textSize="15dp" />
                     </LinearLayout>
 
@@ -236,20 +254,6 @@
 
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/txtTeste"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="teste"
-                android:inputType="text" />
-
-            <!--<View-->
-            <!--android:layout_width="fill_parent"-->
-            <!--android:layout_height="1dp"-->
-            <!--android:layout_marginTop="15dp"-->
-            <!--android:layout_marginBottom="15dp"-->
-            <!--android:focusable="false" />-->
-
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -262,6 +266,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
+                    android:onClick="salvarOnclick"
                     android:text="SALVAR" />
 
                 <Button

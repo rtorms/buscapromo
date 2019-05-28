@@ -41,7 +41,8 @@
         <activity android:name=".Activity.EditarPerfilActivity" />
         <activity
             android:name=".Activity.CadastroPromocaoActivity"
-            android:configChanges="orientation" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="stateHidden"/>
         <activity android:name=".Activity.CadastroUserViaAdmActivity" />
         <activity android:name=".Activity.CadastroUsuarioSimplesActivity" />
         <activity android:name=".Activity.LoginActivity" />

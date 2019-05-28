@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import utfpr.edu.br.buscapromo.Classes.Usuario;
+import utfpr.edu.br.buscapromo.Model.Usuario;
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
 import utfpr.edu.br.buscapromo.R;
 

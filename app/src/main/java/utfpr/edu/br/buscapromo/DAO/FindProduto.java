@@ -10,7 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import utfpr.edu.br.buscapromo.Classes.Produto;
+import utfpr.edu.br.buscapromo.Model.Produto;
 
 public class FindProduto {
 

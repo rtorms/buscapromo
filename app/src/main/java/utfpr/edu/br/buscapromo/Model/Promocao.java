@@ -1,17 +1,18 @@
-package utfpr.edu.br.buscapromo.Classes;
+package utfpr.edu.br.buscapromo.Model;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class Promocao {
 
     private Produto produto;
     private Usuario usuario;
     private Supermercado supermercado;
-    private String valorOriginal;
-    private String valorPromocional;
-    private Date dataInsercao;
-    private Date dataValidade;
+    private Double valorOriginal;
+    private Double valorPromocional;
+    private String dataInsercao;
+    private Timestamp dataValidade;
     private String origem;
+    private String key;
 
 
     public Produto getProduto() {
@@ -38,35 +39,35 @@ public class Promocao {
         this.supermercado = supermercado;
     }
 
-    public String getValorOriginal() {
+    public Double getValorOriginal() {
         return valorOriginal;
     }
 
-    public void setValorOriginal(String valorOriginal) {
+    public void setValorOriginal(Double valorOriginal) {
         this.valorOriginal = valorOriginal;
     }
 
-    public String getValorPromocional() {
+    public Double getValorPromocional() {
         return valorPromocional;
     }
 
-    public void setValorPromocional(String valorPromocional) {
+    public void setValorPromocional(Double valorPromocional) {
         this.valorPromocional = valorPromocional;
     }
 
-    public Date getDataInsercao() {
+    public String getDataInsercao() {
         return dataInsercao;
     }
 
-    public void setDataInsercao(Date dataInsercao) {
+    public void setDataInsercao(String dataInsercao) {
         this.dataInsercao = dataInsercao;
     }
 
-    public Date getDataValidade() {
+    public Timestamp getDataValidade() {
         return dataValidade;
     }
 
-    public void setDataValidade(Date dataValidade) {
+    public void setDataValidade(Timestamp dataValidade) {
         this.dataValidade = dataValidade;
     }
 
@@ -76,6 +77,14 @@ public class Promocao {
 
     public void setOrigem(String origem) {
         this.origem = origem;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
 

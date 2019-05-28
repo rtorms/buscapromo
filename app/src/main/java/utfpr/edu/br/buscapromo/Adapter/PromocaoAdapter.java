@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
 import com.google.firebase.database.DataSnapshot;
@@ -24,16 +23,16 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import utfpr.edu.br.buscapromo.Classes.Produto;
+import utfpr.edu.br.buscapromo.Model.Promocao;
 import utfpr.edu.br.buscapromo.R;
 
 public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewHolder> {
 
-    private List<Produto> produtosList;
+    private List<Promocao> promocaoList;
     private Context context;
     private DatabaseReference referenciaFirebase;
-    private List<Produto> produtos;
-    private Produto todosProdutos;
+    private List<Promocao> promocao;
+    private Promocao todasPromocoes;
     private StorageReference storageReference;
 
     @GlideModule
@@ -41,9 +40,9 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         // leave empty for now
     }
 
-    public PromocaoAdapter(List<Produto> list, Context c) {
+    public PromocaoAdapter(List<Promocao> list, Context c) {
         context = c;
-        produtosList = list;
+        promocaoList = list;
     }
 
     @Override
@@ -57,22 +56,24 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
     @Override
     public void onBindViewHolder(final PromocaoAdapter.ViewHolder holder, int position) {
 
-        final Produto item = produtosList.get(position);
+        final Promocao item = promocaoList.get(position);
 
-        produtos = new ArrayList<>();
+        promocao = new ArrayList<>();
 
         referenciaFirebase = FirebaseDatabase.getInstance().getReference();
 
-        referenciaFirebase.child("produtos").addValueEventListener(new ValueEventListener() {
+        referenciaFirebase.child("promocoes").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                produtos.clear();
+                promocao.clear();
 
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+            //        todasPromocoes.setProduto(postSnapshot.child("produto").getValue(Produto.class));
+//                    todasPromocoes = postSnapshot.getValue(Promocao.class);
+//                    todasPromocoes.setProduto(postSnapshot.child("produto").getValue(Produto.class));
+//                    todasPromocoes.setSupermercado(postSnapshot.child("supermercado").getValue(Supermercado.class));
 
-                    todosProdutos = postSnapshot.getValue(Produto.class);
-
-                    produtos.add(todosProdutos);
+                    promocao.add(todasPromocoes);
                 }
             }
 
@@ -83,19 +84,23 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         });
 
 
-        holder.txtDescricaoProduto.setText(item.getNomeProduto() +" " + item.getTipo() + " " + item.getMarca()
-                + " " + item.getEmbalagem() + " " + item.getConteudo());
-        holder.txtMarcaProduto.setText(item.getMarca());
+        holder.txtDescricaoProduto.setText(item.getProduto().getNomeProduto() +" " + item.getProduto().getTipo()
+                + " " + item.getProduto().getMarca()
+                + " " + item.getProduto().getEmbalagem()
+                + " " + item.getProduto().getConteudo());
+        holder.txtMarcaProduto.setText(item.getProduto().getMarca());
+        holder.txtValorPromocional.setText(item.getSupermercado().getNome());
+      //  holder.txtDataValidadePromocao.setText(item.getDataValidade().toString());
 
 
         // ---- busca de imagem do produto
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         final int height = (displayMetrics.heightPixels / 6);
         final int width = (displayMetrics.widthPixels / 4);
-        Picasso.get().load(item.getUrlImagem()).resize(width, height).into(holder.imgProduto);
+        Picasso.get().load(item.getProduto().getUrlImagem()).resize(width, height).into(holder.imgProduto);
         // ----
 
-        holder.linearLayoutProdutos.setOnClickListener(new View.OnClickListener() {
+        holder.linearLayoutpromocoes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -107,7 +112,7 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
 
     @Override
     public int getItemCount() {
-        return produtosList.size();
+        return promocaoList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -115,7 +120,10 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         protected TextView txtMarcaProduto;
         protected TextView txtDescricaoProduto;
         protected ImageView imgProduto;
-        protected LinearLayout linearLayoutProdutos;
+        protected TextView txtValorOriginal;
+        protected TextView txtValorPromocional;
+        protected TextView txtDataValidadePromocao;
+        protected LinearLayout linearLayoutpromocoes;
 
 
 
@@ -125,7 +133,10 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
             txtMarcaProduto = (TextView) itemView.findViewById(R.id.txtMarcaProduto);
             txtDescricaoProduto = (TextView) itemView.findViewById(R.id.txtDescricaoProduto);
             imgProduto = (ImageView)  itemView.findViewById(R.id.imgProduto);
-            linearLayoutProdutos = (LinearLayout) itemView.findViewById(R.id.linearLayoutProdutos);
+            txtValorOriginal = itemView.findViewById(R.id.txtValorProdutoOficial);
+            txtValorPromocional = itemView.findViewById(R.id.txtValorProdutoUsuario);
+            txtDataValidadePromocao = itemView.findViewById(R.id.txtDataValidadePromocao);
+            linearLayoutpromocoes = (LinearLayout) itemView.findViewById(R.id.linearLayoutPromocoes);
         }
     }
 }

@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import utfpr.edu.br.buscapromo.Classes.Departamento;
+import utfpr.edu.br.buscapromo.Model.Departamento;
 import utfpr.edu.br.buscapromo.R;
 
 public class CadastroDepartamentoActivity extends AppCompatActivity {
@@ -37,7 +37,6 @@ public class CadastroDepartamentoActivity extends AppCompatActivity {
         departamento.setDescricao(edtDepartamento.getText().toString());
 
         try {
-
             key = reference.push().getKey();
             departamento.setIdDepartamento(key);
             reference.push().setValue(departamento);

@@ -1,4 +1,4 @@
-package utfpr.edu.br.buscapromo.Classes;
+package utfpr.edu.br.buscapromo.Model;
 
 import com.google.firebase.database.Exclude;
 

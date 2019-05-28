@@ -27,7 +27,7 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import utfpr.edu.br.buscapromo.Classes.Usuario;
+import utfpr.edu.br.buscapromo.Model.Usuario;
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
 import utfpr.edu.br.buscapromo.Helper.UsuarioLogado;
 import utfpr.edu.br.buscapromo.R;

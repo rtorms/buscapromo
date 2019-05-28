@@ -43,9 +43,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import utfpr.edu.br.buscapromo.Classes.Produto;
+import utfpr.edu.br.buscapromo.Model.Produto;
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
-import utfpr.edu.br.buscapromo.DAO.FindProduto;
 import utfpr.edu.br.buscapromo.DAO.FindProdutos;
 import utfpr.edu.br.buscapromo.R;
 
@@ -194,7 +193,6 @@ public class CadastroProdutoActivity extends AppCompatActivity {
                             urlImagem = downloadUri.toString();
                             salvar();
                         }
-
                     } else {
                         Toast.makeText(CadastroProdutoActivity.this, "Erro ao salvar Produto", Toast.LENGTH_LONG).show();
                     }

@@ -43,7 +43,9 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import utfpr.edu.br.buscapromo.Adapter.PromocaoAdapter;
-import utfpr.edu.br.buscapromo.Classes.Produto;
+import utfpr.edu.br.buscapromo.Model.Produto;
+import utfpr.edu.br.buscapromo.Model.Promocao;
+import utfpr.edu.br.buscapromo.Model.Supermercado;
 import utfpr.edu.br.buscapromo.R;
 
 public class TelaPrincipalActivity extends AppCompatActivity
@@ -62,12 +64,16 @@ public class TelaPrincipalActivity extends AppCompatActivity
     private String departamentoSelecionado;
     private AlertDialog alerta;
 
+    private DatabaseReference databaseReference;
     private RecyclerView mRecyclerViewPromocao;
     private PromocaoAdapter adapter;
     private List<Produto> produtos;
-    private DatabaseReference databaseReference;
     private Produto todosProdutos;
+    private List<Promocao> promocoes;
+    private Promocao todasPromocoes;
     private LinearLayoutManager mLayoutManagerTodosProdutos;
+    private FirebaseUser user;
+    private String keyUser;
 
 
     @Override
@@ -83,7 +89,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
         autenticacao = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference();
         provider = autenticacao.getCurrentUser().getProviders().toString();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         email = user.getEmail();
 
 
@@ -128,6 +134,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
                     for (DataSnapshot posSnapshot : dataSnapshot.getChildren()) {
                         tipoUsuarioCad = posSnapshot.child("tipoUsuario").getValue().toString();
                         userNome.setText(nomeUserLogado = posSnapshot.child("nome").getValue().toString());
+                        keyUser = posSnapshot.getKey();
 
                         if (!tipoUsuarioCad.equals("Administrador")) {
                             menuAdm.setVisible(false);
@@ -146,7 +153,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
             carregaImagemPerfil();
         }
 
-        mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodosProdutos);
+        mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodasPromocoes);
 
         carregarPromocoes();
 
@@ -154,7 +161,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
     private void carregaImagemPerfil() {
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         final StorageReference storageReference = storage.getReferenceFromUrl
@@ -197,6 +204,8 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
         if (id == R.id.nav_InserePromocao) {
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroPromocaoActivity.class);
+            intent.putExtra("tipoUsuario", tipoUsuarioCad);
+            intent.putExtra("keyUser", keyUser);
             abrirTela(intent);
 
         } else if (id == R.id.nav_cadProduto) {
@@ -258,16 +267,20 @@ public class TelaPrincipalActivity extends AppCompatActivity
 //        mRecyclerViewPromocao.setHasFixedSize(true);
         mRecyclerViewPromocao.setLayoutManager(new GridLayoutManager(this, 2));
         //  mLayoutManagerTodosProdutos = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        //    mRecyclerViewPromocao.setLayoutManager(mLayoutManagerTodosProdutos);
-        produtos = new ArrayList<>();
+//            mRecyclerViewPromocao.setLayoutManager(mLayoutManagerTodosProdutos);
+        promocoes = new ArrayList<>();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("produtos").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("promocoes").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                produtos.clear();
+                promocoes.clear();
+                todasPromocoes = new Promocao();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    todosProdutos = postSnapshot.getValue(Produto.class);
-                    produtos.add(todosProdutos);
+                    todasPromocoes.setProduto(postSnapshot.child("produto").getValue(Produto.class));
+                    todasPromocoes.setSupermercado(postSnapshot.child("supermercado").getValue(Supermercado.class));
+
+//                    todasPromocoes = postSnapshot.getValue(Promocao.class);
+                    promocoes.add(todasPromocoes);
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -277,7 +290,7 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
             }
         });
-        adapter = new PromocaoAdapter(produtos, this);
+        adapter = new PromocaoAdapter(promocoes, this);
         mRecyclerViewPromocao.setAdapter(adapter);
     }
 
