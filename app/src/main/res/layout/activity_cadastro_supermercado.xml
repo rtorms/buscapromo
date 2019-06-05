@@ -30,8 +30,8 @@
                 android:id="@+id/edtCadNome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nome"
-                android:inputType="textCapWords" />
+                android:inputType="textCapWords"
+                android:hint="Nome"/>
 
             <EditText
                 android:id="@+id/edtCadEndereco"

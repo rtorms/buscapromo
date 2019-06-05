@@ -1,19 +1,18 @@
 package utfpr.edu.br.buscapromo.Model;
 
-import java.sql.Timestamp;
 
 public class Promocao {
 
     private Produto produto;
-    private Usuario usuario;
-    private Supermercado supermercado;
+    private String usuario;
+    private String supermercado;
     private Double valorOriginal;
     private Double valorPromocional;
-    private String dataInsercao;
-    private Timestamp dataValidade;
-    private String origem;
+    private Integer dataInsercao;
+    private Integer dataValidade;
     private String key;
-
+    private String latitude;
+    private String longitude;
 
     public Produto getProduto() {
         return produto;
@@ -23,19 +22,19 @@ public class Promocao {
         this.produto = produto;
     }
 
-    public Usuario getUsuario() {
+    public String getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
 
-    public Supermercado getSupermercado() {
+    public String getSupermercado() {
         return supermercado;
     }
 
-    public void setSupermercado(Supermercado supermercado) {
+    public void setSupermercado(String supermercado) {
         this.supermercado = supermercado;
     }
 
@@ -55,28 +54,20 @@ public class Promocao {
         this.valorPromocional = valorPromocional;
     }
 
-    public String getDataInsercao() {
+    public Integer getDataInsercao() {
         return dataInsercao;
     }
 
-    public void setDataInsercao(String dataInsercao) {
+    public void setDataInsercao(Integer dataInsercao) {
         this.dataInsercao = dataInsercao;
     }
 
-    public Timestamp getDataValidade() {
+    public Integer getDataValidade() {
         return dataValidade;
     }
 
-    public void setDataValidade(Timestamp dataValidade) {
+    public void setDataValidade(Integer dataValidade) {
         this.dataValidade = dataValidade;
-    }
-
-    public String getOrigem() {
-        return origem;
-    }
-
-    public void setOrigem(String origem) {
-        this.origem = origem;
     }
 
     public String getKey() {
@@ -85,6 +76,22 @@ public class Promocao {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 }
 

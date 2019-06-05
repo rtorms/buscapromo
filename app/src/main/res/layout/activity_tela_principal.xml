@@ -8,28 +8,48 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:layout_marginBottom="2dp"
                 android:text="Principais Promoções"
                 android:textAlignment="center"
-                android:layout_marginTop="60dp"
                 android:textSize="25dp" />
 
-            <EditText
-                android:id="@+id/edtFind"
+            <Spinner
+                android:id="@+id/spFiltro"
+                style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_style"
+                android:visibility="gone" />
+
+            <SearchView
+                android:id="@+id/searchView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:iconifiedByDefault="false"
+                android:queryHint="Procurar"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
 
             <android.support.v7.widget.RecyclerView
@@ -42,24 +62,23 @@
                 android:layout_marginBottom="16dp"
                 android:scrollbars="horizontal" />
 
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
+    </LinearLayout>
 
-            <include
-                layout="@layout/app_bar_tela_principal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+    <include
+        layout="@layout/app_bar_tela_principal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 
-            <android.support.design.widget.NavigationView
-                android:id="@+id/nav_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
-                android:fitsSystemWindows="true"
-                app:headerLayout="@layout/nav_header_tela_principal"
-                app:menu="@menu/activity_tela_principal_drawer" />
-
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_tela_principal"
+        app:menu="@menu/activity_tela_principal_drawer" />
 
 
 </android.support.v4.widget.DrawerLayout>

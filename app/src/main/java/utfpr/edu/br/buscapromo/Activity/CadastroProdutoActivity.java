@@ -14,24 +14,20 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -40,17 +36,19 @@ import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
-import utfpr.edu.br.buscapromo.Model.Produto;
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
-import utfpr.edu.br.buscapromo.DAO.FindProdutos;
+import utfpr.edu.br.buscapromo.DAO.FindListStringGeneric;
+import utfpr.edu.br.buscapromo.DAO.FindObjectGeneric;
+import utfpr.edu.br.buscapromo.DAO.ListStringCallbackInterface;
+import utfpr.edu.br.buscapromo.DAO.ObjectCallbackInterface;
+import utfpr.edu.br.buscapromo.Model.Produto;
 import utfpr.edu.br.buscapromo.R;
 
 
 public class CadastroProdutoActivity extends AppCompatActivity {
 
+    final Activity camera = this;
     private ImageView fotoCadProduto;
     private EditText edtCadNomeProduto;
     private EditText edtCadTipoProduto;
@@ -59,7 +57,6 @@ public class CadastroProdutoActivity extends AppCompatActivity {
     private EditText edtCadCodBarrasProduto;
     private EditText edtCadEmbalagemProduto;
     private AlertDialog alerta;
-    final Activity camera = this;
     private String urlImagem;
     private FirebaseStorage storage;
     private StorageReference storageReference;
@@ -68,9 +65,11 @@ public class CadastroProdutoActivity extends AppCompatActivity {
     private Spinner spDepartamento;
     private String idProd;
     private ProgressBar progressBar;
-    private Button btnBuscaCodBarDig;
-    private FindProdutos findProduto;
+    private FindObjectGeneric findObjectGeneric;
     private Produto produto;
+    private LinearLayout linearLayoutImg;
+    private LinearLayout linearLayoutEdicaoProd;
+    private FindListStringGeneric findListStringGeneric;
 
 
     @Override
@@ -87,36 +86,34 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         edtCadEmbalagemProduto = findViewById(R.id.edtCadEmbalagemProduto);
         spDepartamento = findViewById(R.id.spDepartamento);
         progressBar = findViewById(R.id.progressBarProduto);
-        btnBuscaCodBarDig = findViewById(R.id.btnBuscaCodBarDig);
-        btnBuscaCodBarDig.setVisibility(View.INVISIBLE);
-        findProduto = new FindProdutos();
+        linearLayoutImg = findViewById(R.id.linearLayoutImg);
+        linearLayoutImg.setVisibility(View.GONE);
+        linearLayoutEdicaoProd = findViewById(R.id.linearLayoutEdicaoProd);
+        findObjectGeneric = new FindObjectGeneric();
+        enableDisableView(linearLayoutEdicaoProd, false);
 
         storage = FirebaseStorage.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
-//        database = FirebaseDatabase.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        databaseReference.child("departamentos").addValueEventListener(new ValueEventListener() {
+        findListStringGeneric = new FindListStringGeneric();
+        findListStringGeneric.listaStringGenericCallback("departamentos", "descricao", this, new ListStringCallbackInterface() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final List<String> dep = new ArrayList<String>();
-
-                for (DataSnapshot depSnapshot : dataSnapshot.getChildren()) {
-                    String nomeDep = depSnapshot.child("descricao").getValue(String.class);
-                    dep.add(nomeDep);
-                }
-
-                ArrayAdapter<String> depAdapter = new ArrayAdapter<String>(CadastroProdutoActivity.this,
-                        android.R.layout.simple_spinner_item, dep);
-                depAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            public void onCallback(ArrayAdapter<String> depAdapter) {
                 spDepartamento.setAdapter(depAdapter);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
         });
+    }
+
+    private void enableDisableView(View view, boolean enabled) {
+        view.setEnabled(enabled);
+
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+
+            for (int idx = 0; idx < group.getChildCount(); idx++) {
+                enableDisableView(group.getChildAt(idx), enabled);
+            }
+        }
     }
 
     @Override
@@ -126,11 +123,15 @@ public class CadastroProdutoActivity extends AppCompatActivity {
 
         if (intentResult != null && requestCode == 49374) {
             if (intentResult.getContents() != null) {
+                edtCadCodBarrasProduto.setVisibility(View.VISIBLE);
                 edtCadCodBarrasProduto.setText(intentResult.getContents());
+                linearLayoutImg.setVisibility(View.VISIBLE);
+                findProduto();
 
-//                findProduto();
-                carregaProduto();
             } else {
+                edtCadCodBarrasProduto.setVisibility(View.VISIBLE);
+                enableDisableView(linearLayoutEdicaoProd, true);
+
                 alert("Scan cancelado");
             }
         } else {
@@ -201,87 +202,44 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         }
     }
 
-    // busca através de classe generica, não funciona ver com professor
     private void findProduto() {
-        produto = new Produto();
-        findProduto.carregaProduto(edtCadCodBarrasProduto.getText().toString(), this);
-        produto = findProduto.getNovoproduto();
 
-        if (produto == null) {
-            Toast.makeText(CadastroProdutoActivity.this, "Produto não cadastrado!!", Toast.LENGTH_SHORT).show();
-        }else {
+        linearLayoutImg.setVisibility(View.VISIBLE);
+        enableDisableView(linearLayoutEdicaoProd, true);
+        findObjectGeneric.findObjectCallback("produtos", "codBarras", edtCadCodBarrasProduto.getText().toString(), new Produto(), this, new ObjectCallbackInterface() {
+            @Override
+            public void onCallback(Object object) {
 
+                if (object != null) {
+                    produto = (Produto) object;
+                    edtCadNomeProduto.setText(produto.getNomeProduto());
+                    edtCadTipoProduto.setText(produto.getTipo());
+                    edtCadMarcaProduto.setText(produto.getMarca());
+                    edtCadEmbalagemProduto.setText(produto.getEmbalagem());
+                    edtCadConteudoProduto.setText(produto.getConteudo());
+                    for (int i = 0; i < spDepartamento.getCount(); i++)
+                        if (spDepartamento.getItemAtPosition(i).equals(produto.getDepartamento())) {
 
-            edtCadNomeProduto.setText(produto.getNomeProduto());
-            edtCadTipoProduto.setText(produto.getTipo());
-            edtCadMarcaProduto.setText(produto.getMarca());
-            edtCadEmbalagemProduto.setText(produto.getEmbalagem());
-            edtCadConteudoProduto.setText(produto.getConteudo());
-            for (int i = 0; i < spDepartamento.getCount(); i++)
-                if (spDepartamento.getItemAtPosition(i).equals(produto.getDepartamento())) {
+                            spDepartamento.setSelection(i);
+                        }
+                    idProd = produto.getIdProd();
 
-                    spDepartamento.setSelection(i);
+                    Picasso.get().load(produto.getUrlImagem()).resize(300, 300).centerCrop().into(fotoCadProduto);
+
+                } else {
+                    edtCadNomeProduto.setText("");
+                    edtCadTipoProduto.setText("");
+                    edtCadMarcaProduto.setText("");
+                    edtCadEmbalagemProduto.setText("");
+                    edtCadConteudoProduto.setText("");
+                    spDepartamento.setSelection(0);
+                    fotoCadProduto.setImageResource(R.drawable.ic_menu_camera);
+
                 }
-            idProd = produto.getIdProd();
-        }
-    }
-
-    private void carregaProduto() {
-
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("produtos").orderByChild("codBarras").equalTo(edtCadCodBarrasProduto.getText().toString())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot posSnapshot : dataSnapshot.getChildren()) {
-//                            produto = posSnapshot.getValue(Produto.class);
-                            edtCadNomeProduto.setText(posSnapshot.child("nomeProduto").getValue().toString());
-                            edtCadTipoProduto.setText(posSnapshot.child("tipo").getValue().toString());
-                            edtCadMarcaProduto.setText(posSnapshot.child("marca").getValue().toString());
-                            edtCadEmbalagemProduto.setText(posSnapshot.child("embalagem").getValue().toString());
-                            edtCadConteudoProduto.setText(posSnapshot.child("conteudo").getValue().toString());
-                            for (int i = 0; i < spDepartamento.getCount(); i++)
-                                if (spDepartamento.getItemAtPosition(i).equals(posSnapshot.child("departamento").getValue().toString())) {
-
-                                    spDepartamento.setSelection(i);
-                                }
-                            idProd = posSnapshot.getKey();
-                            carregaImagemProduto();
-                        }
-                        if (!dataSnapshot.exists()) {
-                            Toast.makeText(CadastroProdutoActivity.this, "Produto não cadastrado!!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-    }
-
-    private void carregaImagemProduto() {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-
-        final StorageReference storageReference = storage.getReferenceFromUrl
-                ("gs://buscapromo-7627b.appspot.com/imagemProduto/" + edtCadCodBarrasProduto.getText() + ".jpg");
-
-        final int heigth = 300;
-        final int width = 300;
-
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-
-                Picasso.get().load(uri).resize(width, heigth).centerCrop().into(fotoCadProduto);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CadastroProdutoActivity.this, "Imagem produto não encontrada!!", Toast.LENGTH_SHORT).show();
-
             }
         });
     }
+
 
     public void salvar() {
 
@@ -320,14 +278,9 @@ public class CadastroProdutoActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        resetIntent();
+        recreate();
     }
 
-    private void resetIntent() {
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
-    }
 
     public void btnCancelarOnclickListener(View view) {
 
@@ -381,7 +334,7 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         }
     }
 
-    public void edtCadCodBarrasOnClick(View view) {
+    public void btnBuscaCodBarOnClick(View view) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(CadastroProdutoActivity.this);
         builder.setCancelable(true);
@@ -392,7 +345,6 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    btnBuscaCodBarDig.setVisibility(View.INVISIBLE);
                     IntentIntegrator intentIntegrator = new IntentIntegrator(camera);
                     intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
                     intentIntegrator.setPrompt("SCAN");
@@ -408,15 +360,16 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                edtCadCodBarrasProduto.setVisibility(View.VISIBLE);
+                edtCadCodBarrasProduto.setEnabled(true);
                 edtCadCodBarrasProduto.setFocusable(true);
-                btnBuscaCodBarDig.setVisibility(View.VISIBLE);
             }
         });
         alerta = builder.create();
         alerta.show();
     }
 
-    public void btnBuscaCodBarDigOnclick(View view) {
-        carregaProduto();
+    public void edtCadCodBarrasOnClick(View view) {
+        findProduto();
     }
 }

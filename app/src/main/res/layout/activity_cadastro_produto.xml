@@ -25,6 +25,7 @@
 
 
             <LinearLayout
+                android:id="@+id/linearLayoutImg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="fotoCadProdutoOnClick"
@@ -52,73 +53,84 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/btnBuscaCodBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:onClick="btnBuscaCodBarOnClick"
+                        android:text="INFORMAR CÓDIGO BARRAS" />
 
                     <EditText
                         android:id="@+id/edtCadCodBarrasProduto"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Cod. Barras (click para scan)"
-                        android:inputType="textCapWords"
+                        android:gravity="center"
+                        android:hint="Digite o Código Barras"
+                        android:inputType="number"
+                        android:maxLength="13"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
                         android:onClick="edtCadCodBarrasOnClick" />
-
-                    <Button
-                        android:id="@+id/btnBuscaCodBarDig"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:drawableBottom="@android:drawable/ic_menu_search"
-                        android:onClick="btnBuscaCodBarDigOnclick"
-                        android:visibility="gone"/>
-
 
                 </LinearLayout>
 
-
-                <EditText
-                    android:id="@+id/edtCadNomeProduto"
+                <LinearLayout
+                    android:id="@+id/linearLayoutEdicaoProd"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Nome Produto"
-                    android:inputType="textCapWords" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
 
-                <EditText
-                    android:id="@+id/edtCadTipoProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Tipo Produto"
-                    android:inputType="textCapWords" />
-
-                <EditText
-                    android:id="@+id/edtCadMarcaProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Marca Produto"
-                    android:inputType="textCapWords" />
+                    <EditText
+                        android:id="@+id/edtCadNomeProduto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Nome Produto"
+                        android:inputType="textCapWords" />
 
 
-                <EditText
-                    android:id="@+id/edtCadEmbalagemProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Embalagem Produto"
-                    android:inputType="textCapWords" />
+                    <EditText
+                        android:id="@+id/edtCadTipoProduto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Tipo Produto"
+                        android:inputType="textCapWords" />
+
+                    <EditText
+                        android:id="@+id/edtCadMarcaProduto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Marca Produto"
+                        android:inputType="textCapWords" />
 
 
-                <EditText
-                    android:id="@+id/edtCadConteudoProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Conteúdo Produto"
-                    android:inputType="textCapWords" />
+                    <EditText
+                        android:id="@+id/edtCadEmbalagemProduto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Embalagem Produto"
+                        android:inputType="textCapWords" />
 
-                <Spinner
-                    android:id="@+id/spDepartamento"
-                    style="@android:style/Widget.Holo.Light.Spinner"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content" />
+
+                    <EditText
+                        android:id="@+id/edtCadConteudoProduto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Conteúdo Produto"
+                        android:inputType="textCapWords" />
+
+                    <Spinner
+                        android:id="@+id/spDepartamento"
+                        style="@android:style/Widget.Holo.Light.Spinner"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
 
                 <ProgressBar
                     android:id="@+id/progressBarProduto"

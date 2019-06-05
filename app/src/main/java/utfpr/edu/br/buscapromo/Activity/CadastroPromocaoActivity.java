@@ -1,18 +1,23 @@
 package utfpr.edu.br.buscapromo.Activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -27,8 +32,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +44,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,7 +53,10 @@ import java.util.Date;
 import java.util.List;
 
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
-import utfpr.edu.br.buscapromo.Helper.MaskEditText;
+import utfpr.edu.br.buscapromo.DAO.FindListObjectGeneric;
+import utfpr.edu.br.buscapromo.DAO.FindObjectGeneric;
+import utfpr.edu.br.buscapromo.DAO.ListObjectInterface;
+import utfpr.edu.br.buscapromo.DAO.ObjectCallbackInterface;
 import utfpr.edu.br.buscapromo.Model.Produto;
 import utfpr.edu.br.buscapromo.Model.Promocao;
 import utfpr.edu.br.buscapromo.Model.SolicitaCadastroProduto;
@@ -59,7 +64,7 @@ import utfpr.edu.br.buscapromo.Model.Supermercado;
 import utfpr.edu.br.buscapromo.Model.Usuario;
 import utfpr.edu.br.buscapromo.R;
 
-public class CadastroPromocaoActivity extends AppCompatActivity {
+public class CadastroPromocaoActivity extends AppCompatActivity implements LocationListener {
 
     static final int DATE_DIALOG_ID = 0;
     final Activity camera = this;
@@ -68,7 +73,6 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
     private Button btnFindProduto;
 
     private EditText edtCadCodBarProd;
-    private EditText teste;
     private EditText edtValorProdutoPromocional;
     private EditText edtValorProdutoOriginal;
     private AutoCompleteTextView actvSupermercado;
@@ -87,22 +91,22 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
     private FirebaseDatabase database;
-    private FirebaseAuth autenticacao;
+    private FindObjectGeneric findObjectGeneric;
+    private FindListObjectGeneric findListObjectGeneric;
 
     private ProgressBar progressBar;
     private Date dataInicial = new Date();
     private Date dataFinal = new Date();
 
     private String tagButtonDatain;
-    private String getTipoUsuarioLogado;
-    private String keyUser;
     private String tipoUsuarioLogado;
     private String urlImagem;
+    private String provider;
+    private String nomeUserLogado;
+    private double latitude;
+    private double longitude;
 
-    private Usuario usuario;
     private Produto produto;
-    private Supermercado supermercado;
-    private Supermercado todosSupermercados;
     private List<Supermercado> supermercados;
 
 
@@ -126,7 +130,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
                             dataInicial = sdf.parse(data);
                             dataFinal = sdf.parse(data);
                             if ((dataInicial.before(sdf.parse(dataAtual)))) {
-                                Toast.makeText(getApplicationContext(), "Data Inicial deve ser atual ou posterior, verifique!", Toast.LENGTH_LONG).show();
+                                alert("Data Inicial deve ser atual ou posterior, verifique!");
                             } else {
                                 tvDataInicial.setText(sdf.format(dataInicial));
                                 tvDataFinal.setText(sdf.format(dataInicial));
@@ -139,7 +143,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
                             dataFinal = sdf.parse(data);
                             if (dataFinal.before(dataInicial)) {
                                 tvDataFinal.setText(sdf.format(dataInicial));
-                                Toast.makeText(getApplicationContext(), "Data final deve ser posterior ou igual a inicial, verifique!", Toast.LENGTH_LONG).show();
+                                alert("Data final deve ser posterior ou igual a inicial, verifique!");
                             } else {
                                 tvDataFinal.setText(sdf.format(dataFinal));
                             }
@@ -156,8 +160,9 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cadastro_promocao);
 
         Intent i = getIntent();
-        getTipoUsuarioLogado = i.getStringExtra("tipoUsuario");
-        keyUser = i.getStringExtra("keyUser");
+        tipoUsuarioLogado = i.getStringExtra("tipoUsuario");
+        provider = i.getStringExtra("provider");
+        nomeUserLogado = i.getStringExtra("nomeUserLogado");
 
         storage = FirebaseStorage.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -173,9 +178,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
 
         edtCadCodBarProd = findViewById(R.id.edtCadCodBarProd);
         edtValorProdutoOriginal = findViewById(R.id.edtValorProdutoOriginal);
-      //  edtValorProdutoOriginal.addTextChangedListener(MaskEditText.mask(edtValorProdutoOriginal, MaskEditText.FORMAT_MONEY));
         edtValorProdutoPromocional = findViewById(R.id.edtValorProdutoPromocional);
-     //   edtValorProdutoPromocional.addTextChangedListener(MaskEditText.mask(edtValorProdutoPromocional, MaskEditText.FORMAT_MONEY));
         edtCadCodBarProd = findViewById(R.id.edtCadCodBarProd);
         actvSupermercado = findViewById(R.id.actvSupermercado);
         edtCadCodBarProd.requestFocus();
@@ -186,33 +189,40 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBarPromocao);
         btnFindProduto = findViewById(R.id.btnFindProduto);
 
-        getUsuario(keyUser);
+        findObjectGeneric = new FindObjectGeneric();
+        findListObjectGeneric = new FindListObjectGeneric();
+
+        if (provider.contains("facebook")) {
+            tipoUsuarioLogado = "facebook";
+        }
+        findSupermercado();
+
+        //Ativar GPS - Inicio
+        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            alert("Habilitar GPS");
+            Intent intentGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intentGPS);
+        }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        //Ativar GPS - Fim
+
 
     }
-
-    private void getUsuario(String keyUser) {
-        usuario = new Usuario();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("usuarios").orderByChild("key").equalTo(keyUser).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot posSnapshot : dataSnapshot.getChildren()) {
-                    if (dataSnapshot.exists()) {
-                        usuario = posSnapshot.getValue(Usuario.class);
-                        findSupermercado(usuario);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-    }
-
 
     private String getDateTime() {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -221,8 +231,13 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
     }
 
     public void insereDataOnclick(View view) {
-        tagButtonDatain = view.getTag().toString();
-        showDialog(DATE_DIALOG_ID);
+        if ((tipoUsuarioLogado.equals("Supermercado")) || (tipoUsuarioLogado.equals("Administrador"))) {
+            tagButtonDatain = view.getTag().toString();
+            showDialog(DATE_DIALOG_ID);
+
+        } else {
+            alert("Alteração de datas permitidas somente para supermercados!");
+            }
     }
 
     @Override
@@ -246,32 +261,15 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
 
         IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-        if (intentResult != null && requestCode == 49374) {
-            if (intentResult.getContents() != null) {
-                edtCadCodBarProd.setEnabled(true);
-                edtCadCodBarProd.setText(intentResult.getContents());
-
-                carregaProduto();
-
-            } else {
-                alert("Scan cancelado");
-            }
+        if (intentResult.getContents() != null) {
+            edtCadCodBarProd.setEnabled(true);
+            edtCadCodBarProd.setVisibility(View.VISIBLE);
+            edtCadCodBarProd.setText(intentResult.getContents());
+            findProduto();
         } else {
-
-            final int heigth = 200;
-            final int width = 200;
-
-            if (resultCode == Activity.RESULT_OK) {
-                if (requestCode == 123) {
-                    Uri imagemSelecionada = data.getData();
-                    Picasso.get().load(imagemSelecionada.toString()).resize(width, heigth).centerCrop().into(imgProduto);
-
-                } else if (requestCode == 321) {
-                    Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    imgProduto.setImageBitmap(imageBitmap);
-                }
-            }
+            edtCadCodBarProd.setEnabled(true);
+            edtCadCodBarProd.setVisibility(View.VISIBLE);
+            alert("Scan cancelado");
         }
     }
 
@@ -279,72 +277,40 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 
-    private void carregaProduto() {
+    private void findProduto() {
 
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("produtos").orderByChild("codBarras").equalTo(edtCadCodBarProd.getText().toString())
-                .addValueEventListener(new ValueEventListener() {
+        findObjectGeneric.findObjectCallback("produtos", "codBarras",
+                (edtCadCodBarProd.getText().toString()), new Produto(), this, new ObjectCallbackInterface() {
+
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot posSnapshot : dataSnapshot.getChildren()) {
-
-                            if (dataSnapshot.exists()) {
-                                produto = posSnapshot.getValue(Produto.class);
-                                tvProduto.setText(produto.getNomeProduto() + " " +
-                                        produto.getTipo() + " " +
-                                        produto.getMarca() + " " +
-                                        produto.getEmbalagem() + " " +
-                                        produto.getConteudo()
-                                );
-                                tvMostrarCodBar.setText(produto.getCodBarras());
-                                tvMostrarCodBar.setVisibility(View.VISIBLE);
-                                edtCadCodBarProd.setVisibility(View.GONE);
-                                imgLinearLayout.setVisibility(View.VISIBLE);
-                                imgProduto.setVisibility(View.VISIBLE);
-
-                                carregaImagemProduto();
-                            }
-                        }
-                        if (!dataSnapshot.exists()) {
-                            tvMostrarCodBar.setVisibility(View.GONE);
+                    public void onCallback(Object object) {
+                        produto = (Produto) object;
+                        if (produto.getIdProd() != null) {
+                            tvProduto.setText(produto.getNomeProduto() + " " +
+                                    produto.getTipo() + " " +
+                                    produto.getMarca() + " " +
+                                    produto.getEmbalagem() + " " +
+                                    produto.getConteudo());
+                            tvMostrarCodBar.setText(produto.getCodBarras());
+                            tvMostrarCodBar.setVisibility(View.VISIBLE);
+                            edtCadCodBarProd.setVisibility(View.GONE);
                             imgLinearLayout.setVisibility(View.VISIBLE);
+                            imgProduto.setVisibility(View.VISIBLE);
+
+                            Picasso.get().load(produto.getUrlImagem()).resize(350, 300).centerCrop().into(imgProduto);
+                        } else {
                             imgProduto.setVisibility(View.GONE);
-                            tvProduto.setText("Produto não cadastrado, enviando solicitação de cadastro");
+                            imgLinearLayout.setVisibility(View.VISIBLE);
+                            tvMostrarCodBar.setVisibility(View.GONE);
+                            tvProduto.setVisibility(View.VISIBLE);
+                            tvProduto.setText("Produto não cadastrado, enviando solicitação de cadastro...");
                             solicitaCadastroProduto();
                         }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
     }
 
-    private void carregaImagemProduto() {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        final StorageReference storageReference = storage.getReferenceFromUrl
-                ("gs://buscapromo-7627b.appspot.com/imagemProduto/" + edtCadCodBarProd.getText() + ".jpg");
-
-        final int heigth = 300;
-        final int width = 300;
-
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-
-                Picasso.get().load(uri).resize(width, heigth).centerCrop().into(imgProduto);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(CadastroPromocaoActivity.this, "Imagem produto não encontrada!!", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-    }
-
-    public void btnFinProdutoOnClick(View view) {
+    public void btnFindProdutoOnClick(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(CadastroPromocaoActivity.this);
         builder.setCancelable(true);
         builder.setTitle("Cadastro Promoção");
@@ -354,7 +320,6 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-//                    edtCadCodBarProd.setVisibility(View.VISIBLE);
                     IntentIntegrator intentIntegrator = new IntentIntegrator(camera);
                     intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
                     intentIntegrator.setPrompt("SCAN");
@@ -362,7 +327,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
                     intentIntegrator.initiateScan();
 
                 } catch (Exception e) {
-                    Toast.makeText(CadastroPromocaoActivity.this, "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    alert("Erro: " + e.getMessage());
                 }
             }
         });
@@ -370,240 +335,126 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                imgLinearLayout.setVisibility(View.GONE);
                 edtCadCodBarProd.setEnabled(true);
                 edtCadCodBarProd.setVisibility(View.VISIBLE);
                 edtCadCodBarProd.setFocusable(true);
-//                btnFindCodBarDig.setVisibility(View.VISIBLE);
-//                btnFindProduto.setEnabled(false);
                 tvMostrarCodBar.setVisibility(View.GONE);
-
             }
         });
         alerta = builder.create();
         alerta.show();
     }
-
-
-    public void fotoCadPromocaoOnClick(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(CadastroPromocaoActivity.this);
-        builder.setCancelable(true);
-        builder.setTitle("IMAGEM PRODUTO");
-        builder.setMessage("Como deseja inserir a imagem?");
-
-        builder.setPositiveButton("CÂMERA", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
-                    if (cameraIntent.resolveActivity((getPackageManager())) != null) {
-                        startActivityForResult(cameraIntent, 321);
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(CadastroPromocaoActivity.this, "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        builder.setNegativeButton("ARQUIVO", new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                startActivityForResult(Intent.createChooser(intent, "Selecione uma imagem"), 123);
-            }
-        });
-        alerta = builder.create();
-        alerta.show();
-    }
-
-//    private void cadastraImagemPromocao() {
-//
-//        if (imgProduto.getDrawable().toString().contains("android.graphics.drawable.Vector")) {
-//            Toast.makeText(CadastroPromocaoActivity.this, "Verifique se imagem esta correta!!", Toast.LENGTH_LONG).show();
-//
-//        } else {
-//
-//            final StorageReference salvaFotoReferencia = storageReference.child("imagemPromocao/" + edtCadCodBarProd.getText().toString() + ".jpg");
-//
-//            imgProduto.setDrawingCacheEnabled(true);
-//            imgProduto.buildDrawingCache();
-//
-//            Bitmap bitmap = imgProduto.getDrawingCache();
-//
-//            ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, byteArray);
-//            byte[] data = byteArray.toByteArray();
-//
-//            UploadTask uploadTask = salvaFotoReferencia.putBytes(data);
-//
-//            final Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-//                @Override
-//                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-//                    if (!task.isSuccessful()) {
-//                        throw task.getException();
-//                    }
-//                    return salvaFotoReferencia.getDownloadUrl();
-//                }
-//            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-//                @Override
-//                public void onComplete(@NonNull Task<Uri> task) {
-//                    if (task.isSuccessful()) {
-//                        final Uri downloadUri = task.getResult();
-//                        if (!downloadUri.equals("")) {
-//                            urlImagem = downloadUri.toString();
-//                            salvar();
-//                        }
-//
-//                    } else {
-//                        Toast.makeText(CadastroPromocaoActivity.this, "Erro ao salvar Promoção", Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//            });
-//        }
-//    }
-
 
     private void salvar() {
+
+        Supermercado sup1 = new Supermercado();
+        sup1 = getSupermercado(actvSupermercado.getText().toString());
+
+        Promocao promocao = new Promocao();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        promocao.setDataInsercao(Integer.parseInt(dateFormat.format(dataInicial)));
+        promocao.setDataValidade(Integer.parseInt(dateFormat.format(dataFinal)));
+        promocao.setProduto(produto);
+        promocao.setUsuario(nomeUserLogado);
+
+        if (sup1.getNome() == null) {
+            promocao.setSupermercado(actvSupermercado.getText().toString());
+            promocao.setLatitude(String.valueOf(latitude));
+            promocao.setLongitude(String.valueOf(longitude));
+        } else {
+            promocao.setSupermercado(sup1.getNome());
+            promocao.setLatitude(sup1.getLatitude());
+            promocao.setLongitude(sup1.getLongitude());
+        }
+
+        promocao.setValorOriginal(Double.parseDouble(edtValorProdutoOriginal.getText().toString()));
+        promocao.setValorPromocional(Double.parseDouble(edtValorProdutoPromocional.getText().toString()));
+
+        databaseReference = ConfiguracaoFirebase.getFirebase().child("promocoes");
+        String key = databaseReference.push().getKey();
+
+        if (promocao.getKey() == null) {
+            try {
+                promocao.setKey(key);
+                databaseReference.child(key).setValue(promocao);
+                alert("Promoção Cadastrada com Sucesso!!");
+                recreate();
+            } catch (Exception e) {
+                alert("Erro ao salvar Promoção");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void findSupermercado() {
+        if (tipoUsuarioLogado.equals("Supermercado")) {
+            actvSupermercado.setEnabled(false);
+            actvSupermercado.setText(nomeUserLogado);
+        }
+
+            findListObjectGeneric.findListObjectGeneric(new Supermercado(), "supermercados",
+                    this, new ListObjectInterface() {
+                        @Override
+                        public void onCallback(List<Object> objects) {
+                            supermercados = (List<Supermercado>) (Object) objects;
+
+                            final List<String> sup = new ArrayList<String>();
+                            for (Supermercado s : supermercados) {
+                                String nomeSup = s.getNome();
+                                sup.add(nomeSup);
+                            }
+
+                            ArrayAdapter<String> supAdapter = new ArrayAdapter<String>(CadastroPromocaoActivity.this,
+                                    android.R.layout.simple_dropdown_item_1line, sup);
+                            supAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+                            actvSupermercado.setAdapter(supAdapter);
+
+                        }
+                    });
+
+    }
+
+    private Supermercado getSupermercado(String nomeSupermercado) {
+
+        Supermercado sup2 = new Supermercado();
+        for (int i = 0; i < supermercados.size(); i++) {
+            if (supermercados.get(i).getNome().equals(nomeSupermercado)) {
+                sup2 = supermercados.get(i);
+            }
+        }
+        return sup2;
+    }
+
+    public void salvarOnclick(View view) {
 
         Boolean salvarOk = true;
         Double valorIn = 0.0;
         Double valorOut = 0.0;
 
-        if (produto == null && salvarOk == true) {
-            Toast.makeText(CadastroPromocaoActivity.this, "Produto não informado, não é possível completar operação!", Toast.LENGTH_LONG).show();
+        if (produto == null) {
             salvarOk = false;
-        }
-        if (actvSupermercado.getText().toString().isEmpty() && salvarOk == true) {
-            Toast.makeText(CadastroPromocaoActivity.this, "Supermercado não informado, verifique!", Toast.LENGTH_LONG).show();
+            alert("Produto não informado, não é possível completar operação!");
+        } else if (actvSupermercado.getText().toString().isEmpty()) {
             salvarOk = false;
-        }
-        if (edtValorProdutoOriginal.getText().toString().isEmpty()
-                || edtValorProdutoPromocional.getText().toString().isEmpty() && salvarOk == true) {
-            Toast.makeText(CadastroPromocaoActivity.this, "Valores incorretos!", Toast.LENGTH_LONG).show();
+            alert("Supermercado não informado, verifique!");
+        } else if (edtValorProdutoOriginal.getText().length() < 1
+                || edtValorProdutoPromocional.getText().length() < 1) {
             salvarOk = false;
+            alert("Valores não informados corretamente, verifique!");
 
-        }
-        if (edtValorProdutoOriginal.getText().toString().length() >= 1
-                || edtValorProdutoPromocional.getText().toString().length() >= 1 && salvarOk == true) {
+        } else if (edtValorProdutoOriginal.getText().toString().length() >= 1
+                || edtValorProdutoPromocional.getText().toString().length() >= 1) {
             valorOut = Double.parseDouble(edtValorProdutoPromocional.getText().toString());
             valorIn = Double.parseDouble(edtValorProdutoOriginal.getText().toString());
-        }
-        if (salvarOk == true) {
             if (valorIn < valorOut) {
-                Toast.makeText(CadastroPromocaoActivity.this, "Valor promocional menor que original, verifique os valores!", Toast.LENGTH_LONG).show();
-            } else {
-                Promocao promocao = new Promocao();
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
-                    String txtDateOut = dateFormat.format(dataFinal);
-                    Date parsedDate = dateFormat.parse(txtDateOut);
-
-                    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-                    promocao.setDataInsercao(dateFormat.format(dataInicial));
-
-                    promocao.setDataValidade(timestamp);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                promocao.setProduto(produto);
-                promocao.setUsuario(usuario);
-                promocao.setSupermercado(getSupermercado(actvSupermercado.getText().toString()));
-
-                if (usuario.getTipoUsuario().equals("Supermercado")) {
-                    promocao.setOrigem("Oficial");
-                } else {
-                    promocao.setOrigem("Usuario");
-                }
-                promocao.setValorOriginal(valorIn);
-                promocao.setValorPromocional(valorOut);
-
-                databaseReference = ConfiguracaoFirebase.getFirebase().child("promocoes");
-                String key = databaseReference.push().getKey();
-
-                if (promocao.getKey() == null) {
-                    try {
-
-                        promocao.setKey(key);
-                        databaseReference.child(key).setValue(promocao);
-                        Toast.makeText(CadastroPromocaoActivity.this, "Promoção Cadastrada com Sucesso!!", Toast.LENGTH_LONG).show();
-                        resetIntent();
-                    } catch (Exception e) {
-                        Toast.makeText(CadastroPromocaoActivity.this, "Erro ao salvar Promoção", Toast.LENGTH_LONG).show();
-                        e.printStackTrace();
-                    }
-                }
+                salvarOk = false;
+                alert("Valor promocional maior que original, verifique os valores!");
             }
-        } else {
-            Toast.makeText(CadastroPromocaoActivity.this, "Erro ao salvar Promoção, verifique todos os campos", Toast.LENGTH_LONG).show();
-
-        }
-
-
-    }
-
-
-    private void findSupermercado(Usuario usuario) {
-        if (usuario.getTipoUsuario().equals("Supermercado")) {
-            actvSupermercado.setText(usuario.getNome());
-        } else {
-
-            supermercados = new ArrayList<>();
-            databaseReference = FirebaseDatabase.getInstance().getReference();
-            databaseReference.child("supermercados").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    final List<String> sup = new ArrayList<String>();
-                    supermercados.clear();
-
-                    for (DataSnapshot posSnapshot : dataSnapshot.getChildren()) {
-                        String nomeSup = posSnapshot.child("nome").getValue(String.class);
-                        todosSupermercados = posSnapshot.getValue(Supermercado.class);
-                        sup.add(nomeSup);
-                        ArrayAdapter<String> supAdapter = new ArrayAdapter<String>(CadastroPromocaoActivity.this,
-                                android.R.layout.simple_dropdown_item_1line, sup);
-
-                        supAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-                        actvSupermercado.setAdapter(supAdapter);
-                        supermercados.add(todosSupermercados);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
-
-    private Supermercado getSupermercado(String nomeSupermercado) {
-
-        supermercado = new Supermercado();
-        for (int i = 0; i <= getSuperCount(); i++) {
-            if (supermercados.get(i).getNome().equals(nomeSupermercado)) {
-                supermercado = supermercados.get(i);
-                return supermercado;
+            if (salvarOk == true) {
+                salvar();
             }
         }
-        return supermercado;
-    }
-
-
-    public int getSuperCount() {
-        return supermercados.size();
-    }
-
-    private void resetIntent() {
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
-
-    }
-
-
-    public void salvarOnclick(View view) {
-        salvar();
     }
 
     public void btnCancelarOnclickListener(View view) {
@@ -614,12 +465,10 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
 
 
     public void edtCadCodBarProdOnClick(View view) {
-        if (edtCadCodBarProd.getText().length() != 13 ) {
-            Toast.makeText(CadastroPromocaoActivity.this, "Erro! " +
-                    "Código digitado incorreto!", Toast.LENGTH_LONG).show();
-
+        if (edtCadCodBarProd.getText().length() != 13) {
+            alert("Erro! \n Código digitado incorreto!");
         } else {
-            carregaProduto();
+            findProduto();
         }
     }
 
@@ -633,27 +482,49 @@ public class CadastroPromocaoActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()) {
+                        if (!dataSnapshot.exists()) {
 
                             try {
                                 String key = databaseReference.push().getKey();
                                 solicitaCadastroProduto.setKey(key);
                                 databaseReference.child("solicitaCadastroProduto").child(key).setValue(solicitaCadastroProduto);
-                                Toast.makeText(CadastroPromocaoActivity.this, "Solicitação efetuada com Sucesso!!", Toast.LENGTH_LONG).show();
-
+                                alert("Solicitação efetuada com Sucesso!!");
                             } catch (Exception e) {
-                                Toast.makeText(CadastroPromocaoActivity.this, "Erro! Repita a operação", Toast.LENGTH_LONG).show();
+                                alert("Erro! Repita a operação");
                                 e.printStackTrace();
                             }
-
-                        }else{
-                            Toast.makeText(CadastroPromocaoActivity.this, "Cadastro em andamento, aguarde!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            alert("Cadastro em andamento, aguarde!");
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+
 }
 

@@ -18,6 +18,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -35,9 +38,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
 import utfpr.edu.br.buscapromo.Model.Supermercado;
 import utfpr.edu.br.buscapromo.Model.Usuario;
-import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
 import utfpr.edu.br.buscapromo.R;
 
 public class CadastroSupermercadoActivity extends AppCompatActivity implements LocationListener {
@@ -57,12 +60,20 @@ public class CadastroSupermercadoActivity extends AppCompatActivity implements L
     private DatabaseReference reference;
     private Supermercado supermercado;
     private Usuario usuario;
+    private double latit;
+    private double longit;
+
+    //verificar para retirar, não funcionou como esperado, ver import no gradle
+    private Geofence geofence;
+    private GeofencingClient geofencingClient;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_supermercado);
+
+        geofencingClient = LocationServices.getGeofencingClient(this);
 
         nome = (EditText) findViewById(R.id.edtCadNome);
         endereco = (EditText) findViewById(R.id.edtCadEndereco);
@@ -121,6 +132,7 @@ public class CadastroSupermercadoActivity extends AppCompatActivity implements L
                     supermercado.setLatitude(latitude.getText().toString());
                     supermercado.setLongitude(longitude.getText().toString());
                     supermercado.setUsuario(usuario);
+//                    supermercado.setGeofence(addGeofence());
                     cadastrarUsuario();
                     insereSupermercado(supermercado);
                 } else {
@@ -243,8 +255,8 @@ public class CadastroSupermercadoActivity extends AppCompatActivity implements L
     @Override
     public void onLocationChanged(Location location) {
 
-        double latit = location.getLatitude();
-        double longit = location.getLongitude();
+        latit = location.getLatitude();
+        longit = location.getLongitude();
 
         latitude.setText(String.valueOf(latit));
         longitude.setText(String.valueOf(longit));
@@ -272,5 +284,15 @@ public class CadastroSupermercadoActivity extends AppCompatActivity implements L
         Intent intent = new Intent(CadastroSupermercadoActivity.this, TelaPrincipalActivity.class);
         finish();
         startActivity(intent);
+    }
+
+    private Geofence addGeofence() {
+
+      return  new Geofence.Builder()
+              .setRequestId(nome.getText().toString())
+              .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+              .setCircularRegion(latit, longit, 20)
+              .setExpirationDuration(Geofence.NEVER_EXPIRE)
+              .build();
     }
 }

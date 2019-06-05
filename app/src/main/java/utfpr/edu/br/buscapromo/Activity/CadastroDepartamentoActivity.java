@@ -2,13 +2,17 @@ package utfpr.edu.br.buscapromo.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import utfpr.edu.br.buscapromo.Model.Departamento;
 import utfpr.edu.br.buscapromo.R;
@@ -36,16 +40,34 @@ public class CadastroDepartamentoActivity extends AppCompatActivity {
         departamento = new Departamento();
         departamento.setDescricao(edtDepartamento.getText().toString());
 
-        try {
-            key = reference.push().getKey();
-            departamento.setIdDepartamento(key);
-            reference.push().setValue(departamento);
-            Toast.makeText(CadastroDepartamentoActivity.this, "Departamento Cadastrado com Sucesso!!", Toast.LENGTH_LONG).show();
-            edtDepartamento.setText("");
-        } catch (Exception e) {
-            Toast.makeText(CadastroDepartamentoActivity.this, "Erro ao salvar departamento", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
+        reference.orderByChild("nome").equalTo(departamento.getDescricao())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+
+                            try {
+                                key = reference.push().getKey();
+                                departamento.setIdDepartamento(key);
+                                reference.push().setValue(departamento);
+                                Toast.makeText(CadastroDepartamentoActivity.this, "Departamento Cadastrado com Sucesso!!", Toast.LENGTH_LONG).show();
+                                edtDepartamento.setText("");
+                            } catch (Exception e) {
+                                Toast.makeText(CadastroDepartamentoActivity.this, "Erro ao salvar departamento", Toast.LENGTH_LONG).show();
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Toast.makeText(CadastroDepartamentoActivity.this, "Não é possível cadastro, departamento já cadastrado!", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     public void btnCancelarOnclickListener(View view) {

@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/mLayoutPromocoes">
 
 
     <LinearLayout
-        android:id="@+id/linearLayoutPromocoes"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -17,21 +18,40 @@
             android:columnCount="2"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imgProduto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
+                <CheckBox
+                    android:id="@+id/checkboxPromocao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:id="@+id/imgProduto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
 
             <TextView
                 android:id="@+id/txtMarcaProduto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="Marca do Produto"
+                android:textColor="@android:color/black"
                 android:textSize="15dp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+                android:textStyle="bold" />
 
 
             <TextView
@@ -43,13 +63,11 @@
                 android:textSize="10dp" />
 
 
-
             <TextView
                 android:id="@+id/txtValorProdutoOficial"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="DE: R$"
                 android:textSize="11dp" />
 
             <TextView
@@ -58,14 +76,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:textColor="@android:color/holo_red_dark"
-                android:text="Por: R$"
                 android:textSize="14dp" />
 
-            <TextView
-                android:id="@+id/txtDataValidadePromocao"
+                <TextView
+                android:id="@+id/txtLocal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp" />
+                android:textSize="11dp"
+                android:textColor="@android:color/darker_gray" />
+            </LinearLayout>
 
         </GridLayout>
 

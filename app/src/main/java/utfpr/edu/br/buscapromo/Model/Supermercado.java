@@ -1,5 +1,7 @@
 package utfpr.edu.br.buscapromo.Model;
 
+import com.google.android.gms.location.Geofence;
+
 public class Supermercado {
 
     private String nome;
@@ -65,4 +67,6 @@ public class Supermercado {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
+
 }

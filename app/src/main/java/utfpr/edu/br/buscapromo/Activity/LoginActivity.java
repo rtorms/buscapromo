@@ -101,54 +101,48 @@ public class LoginActivity extends AppCompatActivity {
                 builder.setMessage("Informe seu email:");
                 builder.setView(edEmailRecuperar);
 
-                if(!edEmailRecuperar.getText().equals("")){
-
                     builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            if (edEmailRecuperar.length() > 6 ) {
 
-                            autenticacao = FirebaseAuth.getInstance();
+                                autenticacao = FirebaseAuth.getInstance();
 
-                            String emailRecuperar = edEmailRecuperar.getText().toString();
+                                String emailRecuperar = edEmailRecuperar.getText().toString();
 
-                            autenticacao.sendPasswordResetEmail(emailRecuperar).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                                autenticacao.sendPasswordResetEmail(emailRecuperar).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
 
-                                    if(task.isSuccessful()){
-                                        Toast.makeText(getApplicationContext(), "Email enviado, verifique sua caixa de entrada!" ,Toast.LENGTH_SHORT).show();
-                                        resetIntent();
-                                    }else {
-                                        Toast.makeText(getApplicationContext(), "Falha ao enviar email!" ,Toast.LENGTH_SHORT).show();
-                                        resetIntent();
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(getApplicationContext(), "Email enviado, verifique sua caixa de entrada!", Toast.LENGTH_SHORT).show();
+                                            recreate();
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "Falha ao enviar email!", Toast.LENGTH_SHORT).show();
+                                            recreate();
+                                        }
                                     }
-                                }
-                            });
+                                });
+
+                        }else
+
+                        {
+                            Toast.makeText(getApplicationContext(), "Necessário informar seu email!", Toast.LENGTH_SHORT).show();
+                            recreate();
                         }
+                    }
                     });
 
                     builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            resetIntent();
+                            recreate();
                         }
                     });
-
-                }else{
-                    Toast.makeText(getApplicationContext(), "Necessário informar seu email!" ,Toast.LENGTH_SHORT).show();
-
-                }
-
                 alerta = builder.create();
                 alerta.show();
             }
         });
-    }
-
-    private void resetIntent(){
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
     }
 
     @Override

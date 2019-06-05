@@ -18,7 +18,7 @@
         android:layout_margin="10dp">
 
         <LinearLayout
-            android:id="@+id/linearLayoutCadastroProdutos"
+            android:id="@+id/linearLayoutCarregaProduto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -27,8 +27,8 @@
                 android:id="@+id/imgLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:onClick="fotoCadPromocaoOnClick"
                 android:orientation="vertical">
 
 
@@ -38,14 +38,6 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_menu_camera"/>
-
-                <!--<TextView-->
-                    <!--android:id="@+id/tvImg"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:gravity="center"-->
-                    <!--android:text="Inserir Imagem"-->
-                     <!--/>-->
 
                 <TextView
                     android:id="@+id/tvMostrarCodBar"
@@ -77,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:onClick="btnFinProdutoOnClick"
+                    android:onClick="btnFindProdutoOnClick"
                     android:text="INFORMAR CÓDIGO BARRAS" />
 
 
@@ -95,42 +87,6 @@
 
             </LinearLayout>
 
-
-            <!--<LinearLayout-->
-                <!--android:id="@+id/informarProdutoLinearLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:orientation="vertical"-->
-                <!--android:visibility="gone">-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/edtNomeProduto"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:hint="Nome do Produto"-->
-                    <!--android:textSize="15dp" />-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/edtMarcaProduto"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:hint="Marca do Produto"-->
-                    <!--android:textSize="15dp" />-->
-
-
-                <!--<EditText-->
-                    <!--android:id="@+id/edtDescricaoInformada"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:hint="Descreva o Produto"-->
-                    <!--android:textSize="15dp" />-->
-
-
-            <!--</LinearLayout>-->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -141,6 +97,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:inputType="textCapWords"
                     android:hint="Informe o local" />
 
                 <LinearLayout

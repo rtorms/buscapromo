@@ -1,11 +1,11 @@
 package utfpr.edu.br.buscapromo.Activity;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,14 +13,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,21 +37,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import utfpr.edu.br.buscapromo.Adapter.PromocaoAdapter;
-import utfpr.edu.br.buscapromo.Model.Produto;
+import utfpr.edu.br.buscapromo.DAO.FindListStringGeneric;
+import utfpr.edu.br.buscapromo.DAO.ListStringCallbackInterface;
 import utfpr.edu.br.buscapromo.Model.Promocao;
-import utfpr.edu.br.buscapromo.Model.Supermercado;
 import utfpr.edu.br.buscapromo.R;
 
 public class TelaPrincipalActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
+    public static final String PREFS_NAME = "prefs";
     private FirebaseAuth autenticacao;
     private Menu menu;
     private String nomeUserLogado;
@@ -60,37 +66,35 @@ public class TelaPrincipalActivity extends AppCompatActivity
     private String provider;
     private DatabaseReference reference;
     private String email;
-    private EditText edtFind;
-    private String departamentoSelecionado;
+    private String filtroSelecionado = "todas";
+    private String select = "todas";
     private AlertDialog alerta;
-
+    private FindListStringGeneric findListStringGeneric;
     private DatabaseReference databaseReference;
     private RecyclerView mRecyclerViewPromocao;
     private PromocaoAdapter adapter;
-    private List<Produto> produtos;
-    private Produto todosProdutos;
     private List<Promocao> promocoes;
     private Promocao todasPromocoes;
-    private LinearLayoutManager mLayoutManagerTodosProdutos;
     private FirebaseUser user;
     private String keyUser;
-
+    private Spinner spFiltro;
+    private FloatingActionButton floatingAcBtnCesta;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_principal);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        edtFind = findViewById(R.id.edtFind);
-        edtFind.setEnabled(false);
 
         autenticacao = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference();
         provider = autenticacao.getCurrentUser().getProviders().toString();
         user = FirebaseAuth.getInstance().getCurrentUser();
         email = user.getEmail();
+
+        floatingAcBtnCesta = findViewById(R.id.floatingAcBtnCesta);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -101,18 +105,20 @@ public class TelaPrincipalActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
         //recupera dados nav_header_tela_principal (imagem e nome usuário)
         View headView = navigationView.getHeaderView(0);
         imgPerfil = (CircleImageView) headView.findViewById(R.id.imgPerfilDrawer);
         userNome = (TextView) headView.findViewById(R.id.tvNomeUsuario);
 
+
         //recupera itens do menu
         menu = navigationView.getMenu();
         final MenuItem inserePromo = menu.findItem(R.id.nav_InserePromocao);
-        MenuItem editarPerfil = menu.findItem(R.id.nav_editarPerfil);
+        final MenuItem editarPerfil = menu.findItem(R.id.nav_editarPerfil);
         final MenuItem insereDepartamento = menu.findItem(R.id.nav_cadDepartamento);
         final MenuItem menuAdm = menu.findItem(R.id.itemMenuAdm);
-
+        final MenuItem insereProduto = menu.findItem(R.id.nav_cadProduto);
 
         if (provider.contains("facebook")) {
 
@@ -125,6 +131,8 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
             editarPerfil.setVisible(false);
             menuAdm.setVisible(false);
+            insereDepartamento.setVisible(false);
+            insereProduto.setVisible(false);
 
         } else {
 
@@ -138,9 +146,10 @@ public class TelaPrincipalActivity extends AppCompatActivity
 
                         if (!tipoUsuarioCad.equals("Administrador")) {
                             menuAdm.setVisible(false);
-                        } else if ((!tipoUsuarioCad.equals("Supermercado")) || (!tipoUsuarioCad.equals("Administrador"))) {
+                        }
+                        if (tipoUsuarioCad.equals("Usuario")) {
                             insereDepartamento.setVisible(false);
-                            inserePromo.setVisible(false);
+                            insereProduto.setVisible(false);
                         }
                     }
                 }
@@ -153,10 +162,66 @@ public class TelaPrincipalActivity extends AppCompatActivity
             carregaImagemPerfil();
         }
 
-        mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodasPromocoes);
+        spFiltro = findViewById(R.id.spFiltro);
+        searchView = findViewById(R.id.searchView);
 
+        mRecyclerViewPromocao = (RecyclerView) findViewById(R.id.recycleViewTodasPromocoes);
         carregarPromocoes();
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                filtroSelecionado = "produto";
+                select = query;
+                carregarPromocoes();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+
+    }
+
+
+    private void selecionaFiltro(String filtro, String filtro2) {
+        searchView.setVisibility(View.GONE);
+        spFiltro.setVisibility(View.VISIBLE);
+        findListStringGeneric = new FindListStringGeneric();
+        findListStringGeneric.listaStringGenericCallback(filtro, filtro2, this, new ListStringCallbackInterface() {
+            @Override
+            public void onCallback(ArrayAdapter<String> filtroAdapter) {
+                spFiltro.setAdapter(filtroAdapter);
+                setOnItemSelectedListenerSpFiltro();
+            }
+        });
+    }
+
+    private void setOnItemSelectedListenerSpFiltro() {
+        spFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                select = spFiltro.getSelectedItem().toString();
+                carregarPromocoes();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+
+            }
+
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tela_principal, menu);
+        return true;
     }
 
     private void carregaImagemPerfil() {
@@ -196,16 +261,45 @@ public class TelaPrincipalActivity extends AppCompatActivity
         }
     }
 
+    //filtro
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
+        if (id == R.id.filtrar_todas) {
+            spFiltro.setVisibility(View.GONE);
+            searchView.setVisibility(View.GONE);
+            filtroSelecionado = "todas";
+            carregarPromocoes();
+        } else if (id == R.id.filtrar_supermercado) {
+            selecionaFiltro("supermercados", "nome");
+            filtroSelecionado = "supermercado";
+        } else if (id == R.id.filtrar_departamento) {
+            selecionaFiltro("departamentos", "descricao");
+            filtroSelecionado = "departamento";
+        } else if (id == R.id.filtrar_produto) {
+//            selecionaFiltro( "promocoes","produto");
+            spFiltro.setVisibility(View.GONE);
+            searchView.setVisibility(View.VISIBLE);
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    //menu
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+
         if (id == R.id.nav_InserePromocao) {
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroPromocaoActivity.class);
             intent.putExtra("tipoUsuario", tipoUsuarioCad);
+            intent.putExtra("provider", provider);
             intent.putExtra("keyUser", keyUser);
+            intent.putExtra("nomeUserLogado", userNome.getText().toString());
             abrirTela(intent);
 
         } else if (id == R.id.nav_cadProduto) {
@@ -216,13 +310,10 @@ public class TelaPrincipalActivity extends AppCompatActivity
             Intent intent = new Intent(TelaPrincipalActivity.this, CadastroDepartamentoActivity.class);
             abrirTela(intent);
 
-
-        } else if (id == R.id.nav_manage) {
-
         } else if (id == R.id.nav_editarPerfil) {
 
             Intent intent = new Intent(TelaPrincipalActivity.this, EditarPerfilActivity.class);
-            intent.putExtra("nome", nomeUserLogado);
+            intent.putExtra("nome", userNome.getText().toString());
             intent.putExtra("tipoUsuarioCad", tipoUsuarioCad);
             abrirTela(intent);
 
@@ -261,13 +352,13 @@ public class TelaPrincipalActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-
     private void carregarPromocoes() {
 
-//        mRecyclerViewPromocao.setHasFixedSize(true);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        final Integer dataAtual = Integer.parseInt(dateFormat.format(new Date()));
+
+
         mRecyclerViewPromocao.setLayoutManager(new GridLayoutManager(this, 2));
-        //  mLayoutManagerTodosProdutos = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//            mRecyclerViewPromocao.setLayoutManager(mLayoutManagerTodosProdutos);
         promocoes = new ArrayList<>();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.child("promocoes").addValueEventListener(new ValueEventListener() {
@@ -276,11 +367,34 @@ public class TelaPrincipalActivity extends AppCompatActivity
                 promocoes.clear();
                 todasPromocoes = new Promocao();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    todasPromocoes.setProduto(postSnapshot.child("produto").getValue(Produto.class));
-                    todasPromocoes.setSupermercado(postSnapshot.child("supermercado").getValue(Supermercado.class));
+                    todasPromocoes = postSnapshot.getValue(Promocao.class);
 
-//                    todasPromocoes = postSnapshot.getValue(Promocao.class);
-                    promocoes.add(todasPromocoes);
+                    if (todasPromocoes.getDataValidade() >= dataAtual) {
+
+                        if (filtroSelecionado.equals("todas")) {
+                            promocoes.add(todasPromocoes);
+
+                        }
+                        if ((todasPromocoes.getProduto().getDepartamento().equals(select))) {
+                            promocoes.add(todasPromocoes);
+                        }
+                        if (filtroSelecionado.equals("produto")) {
+                            if ((todasPromocoes.getProduto().getConteudo().equalsIgnoreCase(select))
+                                    || (todasPromocoes.getProduto().getDepartamento().equalsIgnoreCase(select))
+                                    || (todasPromocoes.getProduto().getEmbalagem().equalsIgnoreCase(select))
+                                    || (todasPromocoes.getProduto().getMarca().equalsIgnoreCase(select))
+                                    || (todasPromocoes.getProduto().getNomeProduto().equalsIgnoreCase(select)
+                                    || (todasPromocoes.getProduto().getTipo().equalsIgnoreCase(select)))) {
+                                promocoes.add(todasPromocoes);
+                            }
+                        }
+                        if (todasPromocoes.getSupermercado().equals(select)) {
+                            promocoes.add(todasPromocoes);
+                        }
+                    }
+                }
+                if (promocoes.isEmpty()) {
+                    Toast.makeText(TelaPrincipalActivity.this, "Não há promoções para este filtro", Toast.LENGTH_LONG).show();
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -294,68 +408,20 @@ public class TelaPrincipalActivity extends AppCompatActivity
         mRecyclerViewPromocao.setAdapter(adapter);
     }
 
-    // alterei aqui para testar dialog, necessário rever
-    public void findPromocaoOnClick(View view) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(TelaPrincipalActivity.this);
-        builder.setCancelable(true);
-        builder.setTitle("FILTRAR PESQUISA");
-        builder.setMessage("Como deseja Filtrar?");
+    public void findCestaOnClick(View view) {
 
-        builder.setPositiveButton("TEXTO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-//                edtFind.setEnabled(true);
-//                edtFind.setFocusable(true);
-                // alterei aqui para testar dialog, necessário rever
+        List<Promocao> list = adapter.getPromocoesSelect();
 
-                Dialog mDialog = new Dialog(TelaPrincipalActivity.this, R.style.AppBaseTheme);
-                mDialog.setContentView(R.layout.fullscreen);
-                mDialog.show();
-            }
-        });
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        String connectionsJSONString = new Gson().toJson(list);
+        editor.putString(PREFS_NAME, connectionsJSONString);
+        editor.commit();
 
-        builder.setNegativeButton("Departamento", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                databaseReference.child("departamentos").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        final List<String> dep = new ArrayList<String>();
-
-                        for (DataSnapshot depSnapshot : dataSnapshot.getChildren()) {
-                            String nomeDep = depSnapshot.child("descricao").getValue(String.class);
-                            dep.add(nomeDep);
-                        }
-
-                        ArrayAdapter<String> depAdapter = new ArrayAdapter<String>(TelaPrincipalActivity.this,
-                                R.layout.find_departamento, dep);
-                        //  AlertDialog.Builder builder1 = new AlertDialog.Builder(TelaPrincipalActivity.this);
-
-                        //    depAdapter.setDropDownViewResource(R.layout.find_departamento);
-
-                        builder.setSingleChoiceItems(depAdapter, 0, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                departamentoSelecionado = dialog.toString();
-                                alerta.dismiss();
-                            }
-                        });
-
-                        alerta = builder.create();
-                        alerta.show();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }
-        });
-        alerta = builder.create();
-        alerta.show();
+        Intent i = new Intent(this, MapsActivity.class);
+        recreate();
+        startActivity(i);
     }
-
-
 }
+
 

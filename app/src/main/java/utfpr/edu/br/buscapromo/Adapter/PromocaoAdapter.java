@@ -1,14 +1,24 @@
 package utfpr.edu.br.buscapromo.Adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
@@ -18,22 +28,34 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.zxing.integration.android.IntentIntegrator;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import utfpr.edu.br.buscapromo.Activity.CadastroProdutoActivity;
+import utfpr.edu.br.buscapromo.Activity.MapsActivity;
+import utfpr.edu.br.buscapromo.Activity.TelaPrincipalActivity;
+import utfpr.edu.br.buscapromo.Helper.MaskEditText;
 import utfpr.edu.br.buscapromo.Model.Promocao;
 import utfpr.edu.br.buscapromo.R;
 
-public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewHolder> {
+public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewHolder> implements Serializable {
 
     private List<Promocao> promocaoList;
     private Context context;
-    private DatabaseReference referenciaFirebase;
-    private List<Promocao> promocao;
-    private Promocao todasPromocoes;
-    private StorageReference storageReference;
+    private  List<Promocao> promocoesSelect = new ArrayList<>();
+    private AlertDialog alerta;
+    private Date dataIn = new Date();
+    private Date dataOut = new Date();
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd/MM/yyyy");
+
 
     @GlideModule
     public final class MyAppGlideModule extends AppGlideModule {
@@ -54,44 +76,31 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
     }
 
     @Override
-    public void onBindViewHolder(final PromocaoAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final PromocaoAdapter.ViewHolder holder, final int position) {
 
         final Promocao item = promocaoList.get(position);
 
-        promocao = new ArrayList<>();
-
-        referenciaFirebase = FirebaseDatabase.getInstance().getReference();
-
-        referenciaFirebase.child("promocoes").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                promocao.clear();
-
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-            //        todasPromocoes.setProduto(postSnapshot.child("produto").getValue(Produto.class));
-//                    todasPromocoes = postSnapshot.getValue(Promocao.class);
-//                    todasPromocoes.setProduto(postSnapshot.child("produto").getValue(Produto.class));
-//                    todasPromocoes.setSupermercado(postSnapshot.child("supermercado").getValue(Supermercado.class));
-
-                    promocao.add(todasPromocoes);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
+        holder.txtMarcaProduto.setText(item.getProduto().getMarca());
         holder.txtDescricaoProduto.setText(item.getProduto().getNomeProduto() +" " + item.getProduto().getTipo()
                 + " " + item.getProduto().getMarca()
                 + " " + item.getProduto().getEmbalagem()
                 + " " + item.getProduto().getConteudo());
-        holder.txtMarcaProduto.setText(item.getProduto().getMarca());
-        holder.txtValorPromocional.setText(item.getSupermercado().getNome());
-      //  holder.txtDataValidadePromocao.setText(item.getDataValidade().toString());
 
+        holder.txtValorOriginal.setText("DE: R$ " + item.getValorOriginal());
+        holder.txtValorPromocional.setText( "POR: R$ " + item.getValorPromocional());
+        holder.txtLocal.setText(item.getSupermercado());
+//
+
+
+        String datValid = item.getDataValidade().toString() ;
+        String datIn = item.getDataInsercao().toString();
+        try {
+            dataIn = dateFormat.parse(datIn);
+            dataOut = dateFormat.parse(datValid);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // ---- busca de imagem do produto
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -100,15 +109,47 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         Picasso.get().load(item.getProduto().getUrlImagem()).resize(width, height).into(holder.imgProduto);
         // ----
 
-        holder.linearLayoutpromocoes.setOnClickListener(new View.OnClickListener() {
+
+        holder.checkboxPromocao.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
+                if(holder.checkboxPromocao.isChecked()){
+                    promocoesSelect.add(promocaoList.get(position));
+                }
+            }
+        });
+
+        holder.imgProduto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setCancelable(true);
+                builder.setTitle("Detalhes da Promoção");
+                builder.setMessage("INSERIDO POR:\n" + "\t" + item.getUsuario()
+                        + " \n\nPERÍODO DA PROMOÇÃO:\n" + "\t" + dateFormat2.format(dataIn) +" a "+ dateFormat2.format(dataOut));
+
+                builder.setPositiveButton("Adicionar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                      holder.checkboxPromocao.setChecked(true);
+                    }
+                });
+                builder.setNegativeButton("Voltar", new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                     alerta.dismiss();
+                    }
+                });
+                alerta = builder.create();
+                alerta.show();
+
 
             }
         });
+
     }
-
-
 
     @Override
     public int getItemCount() {
@@ -122,8 +163,8 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         protected ImageView imgProduto;
         protected TextView txtValorOriginal;
         protected TextView txtValorPromocional;
-        protected TextView txtDataValidadePromocao;
-        protected LinearLayout linearLayoutpromocoes;
+        protected TextView txtLocal;
+        protected CheckBox checkboxPromocao;
 
 
 
@@ -135,8 +176,16 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
             imgProduto = (ImageView)  itemView.findViewById(R.id.imgProduto);
             txtValorOriginal = itemView.findViewById(R.id.txtValorProdutoOficial);
             txtValorPromocional = itemView.findViewById(R.id.txtValorProdutoUsuario);
-            txtDataValidadePromocao = itemView.findViewById(R.id.txtDataValidadePromocao);
-            linearLayoutpromocoes = (LinearLayout) itemView.findViewById(R.id.linearLayoutPromocoes);
+            txtLocal = itemView.findViewById(R.id.txtLocal);
+            checkboxPromocao = itemView.findViewById(R.id.checkboxPromocao);
+        }
+    }
+
+    public List<Promocao> getPromocoesSelect() {
+        if(promocoesSelect.isEmpty()){
+            return promocaoList;
+        }else {
+            return promocoesSelect;
         }
     }
 }
