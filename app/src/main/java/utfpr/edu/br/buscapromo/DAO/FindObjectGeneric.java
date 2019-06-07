@@ -2,6 +2,7 @@ package utfpr.edu.br.buscapromo.DAO;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +45,8 @@ public class FindObjectGeneric {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(context, "ERRO!!" + databaseError, Toast.LENGTH_LONG).show();
+
                     }
                 });
     }

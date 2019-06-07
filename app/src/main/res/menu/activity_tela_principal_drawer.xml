@@ -7,16 +7,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_InserePromocao"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@android:drawable/ic_menu_add"
             android:title="Inserir Promoção"
             android:visible = "true"/>
         <item
             android:id="@+id/nav_cadProduto"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@android:drawable/ic_input_add"
             android:title="Cadastro Produtos" />
         <item
             android:id="@+id/nav_cadDepartamento"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@android:drawable/ic_input_add"
             android:title="Cadastro Departamento" />
 
     </group>
@@ -25,11 +25,11 @@
         <menu>
             <item
                 android:id="@+id/nav_editarPerfil"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@android:drawable/ic_menu_edit"
                 android:title="Editar Perfil" />
             <item
                 android:id="@+id/action_deslogar"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@android:drawable/ic_menu_revert"
                 android:title="Desconectar" />
         </menu>
     </item>
@@ -39,11 +39,11 @@
         <menu>
             <item
                 android:id="@+id/action_add_usuario_via_adm"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/ic_menu_manage"
                 android:title="@string/addusuario" />
             <item
                 android:id="@+id/action_add_supermercado"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@drawable/ic_menu_manage"
                 android:title="@string/addsupermercado" />
         </menu>
     </item>

@@ -2,10 +2,7 @@ package utfpr.edu.br.buscapromo.Adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -14,21 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.zxing.integration.android.IntentIntegrator;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -38,10 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import utfpr.edu.br.buscapromo.Activity.CadastroProdutoActivity;
-import utfpr.edu.br.buscapromo.Activity.MapsActivity;
-import utfpr.edu.br.buscapromo.Activity.TelaPrincipalActivity;
-import utfpr.edu.br.buscapromo.Helper.MaskEditText;
 import utfpr.edu.br.buscapromo.Model.Promocao;
 import utfpr.edu.br.buscapromo.R;
 
@@ -89,8 +72,6 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         holder.txtValorOriginal.setText("DE: R$ " + item.getValorOriginal());
         holder.txtValorPromocional.setText( "POR: R$ " + item.getValorPromocional());
         holder.txtLocal.setText(item.getSupermercado());
-//
-
 
         String datValid = item.getDataValidade().toString() ;
         String datIn = item.getDataInsercao().toString();
@@ -144,11 +125,8 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
                 });
                 alerta = builder.create();
                 alerta.show();
-
-
             }
         });
-
     }
 
     @Override
@@ -165,8 +143,6 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
         protected TextView txtValorPromocional;
         protected TextView txtLocal;
         protected CheckBox checkboxPromocao;
-
-
 
         public ViewHolder(View itemView) {
             super(itemView);

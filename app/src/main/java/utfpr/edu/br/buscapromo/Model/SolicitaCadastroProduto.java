@@ -1,6 +1,5 @@
 package utfpr.edu.br.buscapromo.Model;
 
-import android.content.Intent;
 
 public class SolicitaCadastroProduto {
 

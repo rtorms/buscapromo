@@ -59,13 +59,11 @@ public class CadastroDepartamentoActivity extends AppCompatActivity {
 
                         } else {
                             Toast.makeText(CadastroDepartamentoActivity.this, "Não é possível cadastro, departamento já cadastrado!", Toast.LENGTH_LONG).show();
-
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        Toast.makeText(CadastroDepartamentoActivity.this, "ERRO!!" + databaseError, Toast.LENGTH_LONG).show();
                     }
                 });
     }

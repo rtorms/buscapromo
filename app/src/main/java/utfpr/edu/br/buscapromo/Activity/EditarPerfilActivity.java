@@ -207,18 +207,14 @@ public class EditarPerfilActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(EditarPerfilActivity.this, "Imagem perfil não encontrada!!", Toast.LENGTH_SHORT).show();
-
             }
         });
-
-
     }
 
     public void btnCancelarOnclickListener(View view) {
         Intent intent = new Intent(EditarPerfilActivity.this, TelaPrincipalActivity.class);
         finish();
         startActivity(intent);
-
     }
 
     public void btnSalvarPerfilOnClickListener(View view) {
@@ -230,8 +226,6 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 final String novoNome = newNomeUsuario.getText().toString();
                 final String novaSenha = senhaUsuario1.getText().toString();
                 final String email = autenticacao.getCurrentUser().getEmail();
-
-//                final String oldNomeUsuario = autenticacao.getCurrentUser().getDisplayName().toString();
 
                 reference.child("usuarios").orderByChild("email").equalTo(email).addValueEventListener(new ValueEventListener() {
                     @Override
@@ -249,9 +243,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
                                                         reference.child("usuarios").child(keyUser).child("nome").setValue(novoNome);
-
                                                         Toast.makeText(EditarPerfilActivity.this, "Nome salvo com sucesso", Toast.LENGTH_SHORT).show();
-
                                                     }
                                                 }
                                             });
@@ -261,7 +253,6 @@ public class EditarPerfilActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             Toast.makeText(EditarPerfilActivity.this, "Senha salva com sucesso!!", Toast.LENGTH_SHORT).show();
-
                                         }
                                     }
                                 });
@@ -273,10 +264,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
                             finish();
                             startActivity(intent);
                         }
-
                     }
-
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         Toast.makeText(EditarPerfilActivity.this, "Cancelado pelo usuário!!", Toast.LENGTH_LONG).show();
@@ -286,27 +274,20 @@ public class EditarPerfilActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(EditarPerfilActivity.this, "Erro!! Verifique nome e senhas digitadas!", Toast.LENGTH_LONG).show();
             }
-
         } else {
             cadastroFoto();
         }
     }
 
-
     public void onCheckboxClicked(View view) {
         if (checkboxAlteraNomeSenha.isChecked()) {
             if (tipoUsuarioCad.equals("Supermercado")) {
                 newNomeUsuario.setEnabled(false);
-
             }
             newNomeUsuario.setText(oldNomeUsuario.getText());
             editarNomeSenhaLinearLayout.setVisibility(View.VISIBLE);
-
-
         } else {
             editarNomeSenhaLinearLayout.setVisibility(View.GONE);
-
         }
-
     }
 }

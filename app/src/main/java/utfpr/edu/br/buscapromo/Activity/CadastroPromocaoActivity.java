@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,8 +12,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -32,14 +29,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.squareup.picasso.Picasso;
@@ -57,17 +48,18 @@ import utfpr.edu.br.buscapromo.DAO.FindListObjectGeneric;
 import utfpr.edu.br.buscapromo.DAO.FindObjectGeneric;
 import utfpr.edu.br.buscapromo.DAO.ListObjectInterface;
 import utfpr.edu.br.buscapromo.DAO.ObjectCallbackInterface;
+import utfpr.edu.br.buscapromo.DAO.Permissoes;
 import utfpr.edu.br.buscapromo.Model.Produto;
 import utfpr.edu.br.buscapromo.Model.Promocao;
 import utfpr.edu.br.buscapromo.Model.SolicitaCadastroProduto;
 import utfpr.edu.br.buscapromo.Model.Supermercado;
-import utfpr.edu.br.buscapromo.Model.Usuario;
 import utfpr.edu.br.buscapromo.R;
 
 public class CadastroPromocaoActivity extends AppCompatActivity implements LocationListener {
 
     static final int DATE_DIALOG_ID = 0;
     final Activity camera = this;
+    private Permissoes permissoes = new Permissoes();
 
     private Button btnCancelar;
     private Button btnFindProduto;
@@ -86,11 +78,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
     private AlertDialog alerta;
     private LinearLayout imgLinearLayout;
 
-
-    private FirebaseStorage storage;
     private DatabaseReference databaseReference;
-    private StorageReference storageReference;
-    private FirebaseDatabase database;
     private FindObjectGeneric findObjectGeneric;
     private FindListObjectGeneric findListObjectGeneric;
 
@@ -100,7 +88,6 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
 
     private String tagButtonDatain;
     private String tipoUsuarioLogado;
-    private String urlImagem;
     private String provider;
     private String nomeUserLogado;
     private double latitude;
@@ -108,6 +95,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
 
     private Produto produto;
     private List<Supermercado> supermercados;
+    private LocationManager lm;
 
 
     private DatePickerDialog.OnDateSetListener mDateSetListener =
@@ -159,15 +147,12 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_promocao);
 
+        permissoes.permissoes(this, this);
+
         Intent i = getIntent();
         tipoUsuarioLogado = i.getStringExtra("tipoUsuario");
         provider = i.getStringExtra("provider");
         nomeUserLogado = i.getStringExtra("nomeUserLogado");
-
-        storage = FirebaseStorage.getInstance();
-        storageReference = FirebaseStorage.getInstance().getReference();
-        database = FirebaseDatabase.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         tvDataFinal = findViewById(R.id.tvDataFinal);
         tvDataInicial = findViewById(R.id.tvDataInicial);
@@ -175,6 +160,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
         tvDataFinal.setText(getDateTime());
         tvProduto = findViewById(R.id.tvProduto);
         tvMostrarCodBar = findViewById(R.id.tvMostrarCodBar);
+        btnCancelar = findViewById(R.id.btnCancelar);
 
         edtCadCodBarProd = findViewById(R.id.edtCadCodBarProd);
         edtValorProdutoOriginal = findViewById(R.id.edtValorProdutoOriginal);
@@ -196,12 +182,8 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
             tipoUsuarioLogado = "facebook";
         }
         findSupermercado();
-
-        //Ativar GPS - Inicio
-        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        lm = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -211,17 +193,8 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-
-        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            alert("Habilitar GPS");
-            Intent intentGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intentGPS);
-        }
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        //Ativar GPS - Fim
-
-
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     }
 
     private String getDateTime() {
@@ -237,7 +210,7 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
 
         } else {
             alert("Alteração de datas permitidas somente para supermercados!");
-            }
+        }
     }
 
     @Override
@@ -378,8 +351,10 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
             try {
                 promocao.setKey(key);
                 databaseReference.child(key).setValue(promocao);
-                alert("Promoção Cadastrada com Sucesso!!");
                 recreate();
+                alert("Promoção Cadastrada com Sucesso!!");
+                edtValorProdutoPromocional.setText("");
+                edtValorProdutoOriginal.setText("");
             } catch (Exception e) {
                 alert("Erro ao salvar Promoção");
                 e.printStackTrace();
@@ -393,26 +368,24 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
             actvSupermercado.setText(nomeUserLogado);
         }
 
-            findListObjectGeneric.findListObjectGeneric(new Supermercado(), "supermercados",
-                    this, new ListObjectInterface() {
-                        @Override
-                        public void onCallback(List<Object> objects) {
-                            supermercados = (List<Supermercado>) (Object) objects;
+        findListObjectGeneric.findListObjectGeneric(new Supermercado(), "supermercados",
+                this, new ListObjectInterface() {
+                    @Override
+                    public void onCallback(List<Object> objects) {
+                        supermercados = (List<Supermercado>) (Object) objects;
 
-                            final List<String> sup = new ArrayList<String>();
-                            for (Supermercado s : supermercados) {
-                                String nomeSup = s.getNome();
-                                sup.add(nomeSup);
-                            }
-
-                            ArrayAdapter<String> supAdapter = new ArrayAdapter<String>(CadastroPromocaoActivity.this,
-                                    android.R.layout.simple_dropdown_item_1line, sup);
-                            supAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-                            actvSupermercado.setAdapter(supAdapter);
-
+                        final List<String> sup = new ArrayList<String>();
+                        for (Supermercado s : supermercados) {
+                            String nomeSup = s.getNome();
+                            sup.add(nomeSup);
                         }
-                    });
 
+                        ArrayAdapter<String> supAdapter = new ArrayAdapter<String>(CadastroPromocaoActivity.this,
+                                android.R.layout.simple_dropdown_item_1line, sup);
+                        supAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+                        actvSupermercado.setAdapter(supAdapter);
+                    }
+                });
     }
 
     private Supermercado getSupermercado(String nomeSupermercado) {
@@ -474,33 +447,34 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
 
     public void solicitaCadastroProduto() {
 
-        final SolicitaCadastroProduto solicitaCadastroProduto = new SolicitaCadastroProduto();
-        solicitaCadastroProduto.setCodBarras(edtCadCodBarProd.getText().toString());
-
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("solicitaCadastroProduto").orderByChild("codBarras").equalTo(edtCadCodBarProd.getText().toString())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        findObjectGeneric.findObjectCallback("solicitaCadastroProduto", "codBarras",
+                (edtCadCodBarProd.getText().toString()), new SolicitaCadastroProduto(), this, new ObjectCallbackInterface() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (!dataSnapshot.exists()) {
-
+                    public void onCallback(Object object) {
+                        SolicitaCadastroProduto novoCadastro = new SolicitaCadastroProduto();
+                        novoCadastro = (SolicitaCadastroProduto) object;
+                        if (novoCadastro.getKey() == null) {
                             try {
+                                databaseReference = FirebaseDatabase.getInstance().getReference();
+                                SolicitaCadastroProduto solicitaCadastroProduto = new SolicitaCadastroProduto();
                                 String key = databaseReference.push().getKey();
                                 solicitaCadastroProduto.setKey(key);
+                                solicitaCadastroProduto.setCodBarras(edtCadCodBarProd.getText().toString());
                                 databaseReference.child("solicitaCadastroProduto").child(key).setValue(solicitaCadastroProduto);
                                 alert("Solicitação efetuada com Sucesso!!");
+                                edtCadCodBarProd.setText("");
+                                recreate();
                             } catch (Exception e) {
                                 alert("Erro! Repita a operação");
                                 e.printStackTrace();
                             }
                         } else {
                             alert("Cadastro em andamento, aguarde!");
+                            edtCadCodBarProd.setText("");
+                            recreate();
                         }
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
                 });
     }
 

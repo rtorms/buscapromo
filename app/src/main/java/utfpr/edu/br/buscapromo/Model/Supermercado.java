@@ -1,6 +1,5 @@
 package utfpr.edu.br.buscapromo.Model;
 
-import com.google.android.gms.location.Geofence;
 
 public class Supermercado {
 

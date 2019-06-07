@@ -2,7 +2,9 @@ package utfpr.edu.br.buscapromo.Activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +28,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import utfpr.edu.br.buscapromo.Model.Usuario;
 import utfpr.edu.br.buscapromo.DAO.ConfiguracaoFirebase;
@@ -50,9 +57,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        edtEmailLogin = ( EditText ) findViewById( R.id.edtEmail );
-        edtSenhaLogin = ( EditText ) findViewById( R.id.edtSenha );
-        btnLogin = ( Button ) findViewById( R.id.btnLogin );
+        edtEmailLogin = (EditText) findViewById(R.id.edtEmail);
+        edtSenhaLogin = (EditText) findViewById(R.id.edtSenha);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         tvRecuperarSenha = (TextView) findViewById(R.id.tvRecuperarSenha);
 
@@ -76,8 +83,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException error) {
 
-                Toast.makeText(LoginActivity.this, "Usuário ou senha inválidos! Tente novamente", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(LoginActivity.this, "Verifique conexão de dados! \n" +
+                        "Verifique usuário e senha! \n" +
+                        "Tennte novamente!", Toast.LENGTH_SHORT).show();
             }
         });
 

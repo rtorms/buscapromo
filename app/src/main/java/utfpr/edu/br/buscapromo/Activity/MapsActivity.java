@@ -1,6 +1,5 @@
 package utfpr.edu.br.buscapromo.Activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -60,7 +59,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -89,8 +87,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         for (String key : map.keySet()) {
             Promocao c = map.get(key);
-            for(Promocao p2 : listPromocoes ){
-                if(p2.getSupermercado().equals(key)){
+            for (Promocao p2 : listPromocoes) {
+                if (p2.getSupermercado().equals(key)) {
                     somaTotal += p2.getValorPromocional();
                 }
             }
