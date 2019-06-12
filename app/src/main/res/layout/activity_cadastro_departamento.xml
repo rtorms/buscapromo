@@ -10,7 +10,7 @@ android:layout_marginRight="16dp"
 android:layout_marginBottom="16dp"
 android:gravity="center"
 android:orientation="vertical"
-    tools:context=".Activity.CadastroDepartamentoActivity">
+    tools:context=".activity.CadastroDepartamentoActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

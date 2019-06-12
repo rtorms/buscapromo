@@ -39,10 +39,10 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".Activity.MapsActivity"
+            android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
-        <activity android:name=".Activity.CadastroDepartamentoActivity" />
-        <activity android:name=".Activity.MainActivity">
+        <activity android:name=".activity.CadastroDepartamentoActivity" />
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,20 +50,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.TelaPrincipalActivity"
+            android:name=".activity.TelaPrincipalActivity"
             android:label="@string/title_activity_tela_principal"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activity.CadastroSupermercadoActivity" />
-        <activity android:name=".Activity.EditarPerfilActivity" />
+        <activity android:name=".activity.CadastroSupermercadoActivity" />
+        <activity android:name=".activity.EditarPerfilActivity" />
         <activity
-            android:name=".Activity.CadastroPromocaoActivity"
+            android:name=".activity.CadastroPromocaoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".Activity.CadastroUserViaAdmActivity" />
-        <activity android:name=".Activity.CadastroUsuarioSimplesActivity" />
-        <activity android:name=".Activity.LoginActivity" />
+        <activity android:name=".activity.CadastroUserViaAdmActivity" />
+        <activity android:name=".activity.CadastroUsuarioSimplesActivity" />
+        <activity android:name=".activity.LoginActivity" />
         <activity
-            android:name=".Activity.CadastroProdutoActivity"
+            android:name=".activity.CadastroProdutoActivity"
             android:configChanges="orientation"/>
 
         <meta-data

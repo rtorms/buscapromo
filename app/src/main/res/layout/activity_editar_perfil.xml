@@ -7,7 +7,7 @@
     android:layout_gravity="center"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".Activity.EditarPerfilActivity">
+    tools:context=".activity.EditarPerfilActivity">
 
     <ScrollView
         android:layout_width="match_parent"
