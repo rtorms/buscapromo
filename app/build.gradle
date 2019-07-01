@@ -36,7 +36,7 @@ dependencies {
     //banco de dados firebase
     implementation 'com.google.firebase:firebase-database:16.1.0'
     //login facebook
-    implementation 'com.facebook.android:facebook-login:[4,5)'
+    implementation 'com.facebook.android:facebook-login:[5,6)'
     implementation 'com.google.firebase:firebase-core:16.0.8'
     //picasso - tratamento imagem
     implementation 'com.squareup.picasso:picasso:2.71828'

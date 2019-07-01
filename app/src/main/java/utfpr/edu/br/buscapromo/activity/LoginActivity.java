@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 Toast.makeText(LoginActivity.this, "Verifique conexão de dados! \n" +
                         "Verifique usuário e senha! \n" +
-                        "Tennte novamente!", Toast.LENGTH_SHORT).show();
+                        "Tente novamente!", Toast.LENGTH_SHORT).show();
             }
         });
 

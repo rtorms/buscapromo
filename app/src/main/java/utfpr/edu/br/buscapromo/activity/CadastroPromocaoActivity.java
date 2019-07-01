@@ -462,16 +462,16 @@ public class CadastroPromocaoActivity extends AppCompatActivity implements Locat
                                 solicitaCadastroProduto.setCodBarras(edtCadCodBarProd.getText().toString());
                                 databaseReference.child("solicitaCadastroProduto").child(key).setValue(solicitaCadastroProduto);
                                 alert("Solicitação efetuada com Sucesso!!");
-                                edtCadCodBarProd.setText("");
-                                recreate();
+//                                edtCadCodBarProd.setText("");
+//                                recreate();
                             } catch (Exception e) {
                                 alert("Erro! Repita a operação");
                                 e.printStackTrace();
                             }
                         } else {
                             alert("Cadastro em andamento, aguarde!");
-                            edtCadCodBarProd.setText("");
-                            recreate();
+//                            edtCadCodBarProd.setText("");
+//                            recreate();
                         }
                     }
 

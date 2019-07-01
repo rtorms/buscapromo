@@ -32,7 +32,7 @@ public class PromocaoAdapter  extends RecyclerView.Adapter<PromocaoAdapter.ViewH
 
     private List<Promocao> promocaoList;
     private Context context;
-    private  List<Promocao> promocoesSelect = new ArrayList<>();
+    private List<Promocao> promocoesSelect = new ArrayList<>();
     private AlertDialog alerta;
     private Date dataIn = new Date();
     private Date dataOut = new Date();
